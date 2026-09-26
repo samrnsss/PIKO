@@ -1,16 +1,17 @@
-# React + Vite
+# PIKO 🧠✨
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+PIKO is a personal productivity and life-management dashboard designed to bring different aspects of everyday life into one organized space.
 
-Currently, two official plugins are available:
+It helps manage **tasks, goals, habits, learning, projects, and notes** through a clean and simple interface. The idea behind PIKO is to reduce the need to switch between different tools and create one personal space where you can plan, track, and reflect on your progress.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Core Features
 
-## React Compiler
+* 📊 **Dashboard** — A central overview of your daily activities and progress.
+* ✅ **Task Management** — Create, organize, and keep track of tasks.
+* 🎯 **Goal Tracking** — Set personal goals and monitor your progress.
+* 🔄 **Habit Tracking** — Track habits and build consistency over time.
+* 📚 **Learning Tracker** — Organize and keep track of your learning journey.
+* 🚀 **Project Management** — Keep track of personal projects and their progress.
+* 📝 **Notes** — Store ideas, thoughts, and important information in one place.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+PIKO is currently being developed as a learning project while exploring **React, JavaScript, frontend development, and modern UI design**.
