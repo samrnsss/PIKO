@@ -3,15 +3,94 @@ import DataContext from "../context/DataContext";
 
 function Tasks() {
 
-    const { tasks, addTask, toggleTask, deleteTask } = useContext(DataContext);
+    const { tasks, addTask,updateTask, toggleTask, deleteTask } = useContext(DataContext);
 
     const [task, setTask] = useState("");
+    const [priority, setPriority] = useState("Medium");
+    const[filter, setFilter] = useState("All");
+    const [dueDate, setDueDate] = useState("");
+    const [editingTaskId, setEditingTaskId] = useState(null);
 
     function handleAddTask() {
-        if (task.trim() === "") return;
+        if (task.trim() === "") {
+            return;
+        }
 
-        addTask(task);
+        addTask({ text: task, priority, dueDate });
         setTask("");
+        setPriority("Medium");
+        setDueDate("");
+    }
+
+    const filteredTasks = tasks.filter((task) =>{
+        if (filter === "Pending") {
+            return !task.completed;
+        }
+
+        if(filter == "Completed"){
+            return task.completed;
+        }
+
+        if(filter == "High"){
+            return task.priority === "High";
+        }
+
+        if (filter === "Medium"){
+            return task.priority === "Medium";
+        }
+
+        if(filter === "Low"){
+            return task.priority === "Low";
+        }
+        return true;
+    })
+
+    const today = new Date().toISOString().split("T")[0];
+
+    const getDueStatus = (task) =>{
+        if(!task.dueDate || task.completed){
+            return "";
+        }
+
+        if(task.dueDate < today){
+            return "Overdue";
+        }
+
+        if(task.dueDate === today){
+            return "Due Today";
+        }
+        return "";
+    };
+
+        function handleEditTask(task) {
+        setTask(task.text);
+        setPriority(task.priority || "Medium");
+        setDueDate(task.dueDate || "");
+        setEditingTaskId(task.id);
+    }
+
+    function handleUpdateTask() {
+        if (task.trim() === "") {
+            return;
+        }
+
+        updateTask(editingTaskId, {
+            text: task,
+            priority,
+            dueDate
+        });
+
+        setTask("");
+        setPriority("Medium");
+        setDueDate("");
+        setEditingTaskId(null);
+    }
+
+    function handleCancelEdit() {
+        setTask("");
+        setPriority("Medium");
+        setDueDate("");
+        setEditingTaskId(null);
     }
 
     return (
@@ -35,16 +114,63 @@ function Tasks() {
                         }
                     }}
                 />
+                <input 
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                />
 
+                {editingTaskId === null ?(
                 <button onClick={handleAddTask}>
                     Add Task
                 </button>
+                ) : (
+                <>
+                    <button onClick={handleUpdateTask}>
+                        Update Task
+                    </button>
 
+                    <button 
+                    className = "cancel-btn"
+                    onClick={handleCancelEdit}
+                    >
+                        Cancel
+                    </button>
+                </>
+                )}
+                <select
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value)}
+                >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+
+            </div>
+
+            <div className="task-filter">
+
+                    {["All", "Pending", "Completed", "High", "Medium", "Low", "Overdue"].map(
+                        (option) => (
+                            <button
+                                key={option}
+                                className={
+                                    filter === option
+                                        ? "filter-btn active"
+                                        : "filter-btn"
+                                }
+                                onClick={() => setFilter(option)}
+                            >
+                                {option}
+                            </button>
+                        )
+                    )}
             </div>
 
             <div className="task-list">
 
-                {tasks.map((task) => (
+                {filteredTasks.map((task) => (
 
                     <div className="task-item" key={task.id}>
 
@@ -56,20 +182,50 @@ function Tasks() {
                                 onChange={() => toggleTask(task.id)}
                             />
 
-                            <span
-                                className={task.completed ? "completed" : ""}
-                            >
+                            <div className="task-info">
+
+                            <span className={task.completed ? "completed" : ""}>
                                 {task.text}
                             </span>
 
+                            <span className={`task-priority ${task.priority?.toLowerCase()}`}>
+                                {task.priority || "Medium"}
+                            </span>
+
+                            {task.dueDate && (
+                                <span className="task-due-date">
+                                    Due: {new Date(
+                                        task.dueDate + "T00:00:00"
+                                    ).toLocaleDateString()}
+                                </span>
+                            )}
+
+                            {getDueStatus(task) && (
+                                <span className="task-status">
+                                    {getDueStatus(task)}
+                                </span>
+                            )}
+                            
+
+                            
                         </div>
 
-                        <button
-                            className="delete-btn"
-                            onClick={() => deleteTask(task.id)}
-                        >
-                            Delete
-                        </button>
+                        </div>
+                        
+                        <div className = "task-actions">
+                            <button
+                                className="edit-btn"
+                                onClick={() => handleEditTask(task)}
+                            >
+                                Edit
+                            </button>
+                            <button
+                                className="delete-btn"
+                                onClick={() => deleteTask(task.id)}
+                            >
+                                Delete
+                            </button>
+                        </div>
 
                     </div>
 

@@ -55,11 +55,55 @@ function Dashboard() {
     }
 
 
+    // GOAL PROGRESS
+    const goalProgress = getProgress(goals);
+
+
+    // PROJECT STATUS
+    const projectStatus = {
+
+        notStarted: projects.filter(
+            (project) => project.status === "Not Started"
+        ).length,
+
+        inProgress: projects.filter(
+            (project) => project.status === "In Progress"
+        ).length,
+
+        completed: projects.filter(
+            (project) => project.status === "Completed"
+        ).length
+    };
+
+    const today = new Date().toISOString().split("T")[0];
+    const overdueTasks = tasks.filter(
+        (task) => 
+            task.dueDate && task.dueDate < today && !task.completed
+    ).length;
+    
+    const todayTasks = tasks.filter(
+        (task) => 
+            !task.completed && task.dueDate === today
+    ).length;
+
+    const upcomingTasks = tasks.filter(
+        (task) => 
+            task.dueDate && task.dueDate > today && !task.completed
+    ).length;
+
+    const highPriorityTasks = tasks.filter(
+        (task) =>
+            !task.completed && 
+        task.priority === "High"
+    ).length;
+
+    // OTHER PROGRESS
     const taskProgress = getProgress(tasks);
     const habitProgress = getProgress(habits);
     const learningProgress = getProgress(topics);
 
 
+    // OVERALL PROGRESS
     const overallProgress = Math.round(
         (taskProgress + habitProgress + learningProgress) / 3
     );
@@ -137,6 +181,77 @@ function Dashboard() {
 
             </div>
 
+            <div className="task-overview-card">
+
+                <h2>Task Overview</h2>
+                <div className="task-overview">
+                    <div>
+                        <strong> {overdueTasks}</strong>
+                        <span> Overdue </span>
+                    </div>
+
+                <div>
+                    <strong> {todayTasks}</strong>
+                    <span> Due Today </span>
+                </div>
+                <div>
+                    <strong> {upcomingTasks}</strong>
+                    <span> Upcoming </span>
+                </div>
+                <div>
+                    <strong> {highPriorityTasks}</strong>
+                    <span> High Priority </span>
+                </div>
+            </div>
+                </div>
+                
+
+
+            {/* GOALS + PROJECTS */}
+
+            <div className="dashboard-extra">
+
+                <div className="goal-progress-card">
+
+                    <h2>Goal Progress</h2>
+
+                    <ProgressBar
+                        label="Goals"
+                        progress={goalProgress}
+                    />
+
+                </div>
+
+
+                <div className="project-status-card">
+
+                    <h2>Project Status</h2>
+
+                    <div className="project-status">
+                        <span>Not Started</span>
+                        <strong>
+                            {projectStatus.notStarted}
+                        </strong>
+                    </div>
+
+                    <div className="project-status">
+                        <span>In Progress</span>
+                        <strong>
+                            {projectStatus.inProgress}
+                        </strong>
+                    </div>
+
+                    <div className="project-status">
+                        <span>Completed</span>
+                        <strong>
+                            {projectStatus.completed}
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
 
             {/* RECENT TASKS */}
 
@@ -152,73 +267,84 @@ function Dashboard() {
 
                 ) : (
 
-                    tasks.slice(-5).reverse().map((task) => (
+                    tasks
+                        .slice(-5)
+                        .reverse()
+                        .map((task) => (
 
-                        <div
-                            className="recent-task"
-                            key={task.id}
-                        >
-
-                            <span
-                                className={
-                                    task.completed
-                                        ? "completed"
-                                        : ""
-                                }
+                            <div
+                                className="recent-task"
+                                key={task.id}
                             >
-                                {task.text}
-                            </span>
 
-                            <span>
-                                {task.completed
-                                    ? "✓"
-                                    : "○"}
-                            </span>
+                                <span
+                                    className={
+                                        task.completed
+                                            ? "completed"
+                                            : ""
+                                    }
+                                >
+                                    {task.text}
+                                </span>
 
-                        </div>
+                                <span>
+                                    {task.completed
+                                        ? "✓"
+                                        : "○"}
+                                </span>
 
-                    ))
+                            </div>
+
+                        ))
 
                 )}
-                </div>
-                {/* TODAY'S FOCUS */}
 
-                <div className="todays-focus">
+            </div>
 
-                    <h2>Today's Focus</h2>
 
-                    {tasks.filter((task) => !task.completed).length === 0 ? (
+            {/* TODAY'S FOCUS */}
 
-                        <p className="empty-message">
-                            Nothing urgent today. Enjoy your day! 🌱
-                        </p>
+            <div className="todays-focus">
 
-                    ) : (
+                <h2>Today's Focus</h2>
 
-                        tasks
-                            .filter((task) => !task.completed)
-                            .slice(0, 3)
-                            .map((task) => (
+                {tasks.filter(
+                    (task) => !task.completed
+                ).length === 0 ? (
 
-                                <div
-                                    className="focus-item"
-                                    key={task.id}
-                                >
+                    <p className="empty-message">
+                        Nothing urgent today. Enjoy your day! 🌱
+                    </p>
 
-                                    <span>○</span>
+                ) : (
 
-                                    <span>{task.text}</span>
+                    tasks
+                        .filter((task) => !task.completed)
+                        .slice(0, 3)
+                        .map((task) => (
 
-                                </div>
+                            <div
+                                className="focus-item"
+                                key={task.id}
+                            >
 
-                            ))
+                                <span>○</span>
 
-                    )}
+                                <span>
+                                    {task.text}
+                                </span>
 
-                </div>
-            
+                            </div>
+
+                        ))
+
+                )}
+
+            </div>
+
         </section>
     );
 }
+
 
 export default Dashboard;

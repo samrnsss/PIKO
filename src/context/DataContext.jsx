@@ -17,12 +17,29 @@ export function DataProvider({ children }) {
     function addTask(task) {
         const newTask = {
             id: Date.now(),
-            text: task,
+            text: task.text,
+            priority: task.priority,
+            dueDate: task.dueDate,
             completed: false
         };
 
         setTasks((prevTasks) => [...prevTasks, newTask]);
     }
+
+    function updateTask(id, updatedTask) {
+    setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+            task.id === id
+                ? {
+                    ...task,
+                    text: updatedTask.text,
+                    priority: updatedTask.priority,
+                    dueDate: updatedTask.dueDate
+                }
+                : task
+        )
+    );
+}
 
     function toggleTask(id) {
         setTasks((prevTasks) =>
@@ -214,13 +231,29 @@ export function DataProvider({ children }) {
             const newNote = {
                 id: Date.now(),
                 title: note.title,
-                content: note.content
+                content: note.content,
+                createdAt: new Date().toISOString()
             };
 
             setNotes((prevNotes) => [
                 ...prevNotes,
                 newNote
             ]);
+        }
+
+        function updateNote(id, updatedNote) {
+            setNotes((prevNotes) =>
+                prevNotes.map((note) =>
+                    note.id === id
+                        ? {
+                            ...note,
+                            title: updatedNote.title,
+                            content: updatedNote.content,
+                            updatedAt: new Date().toISOString()
+                        }
+                        : note
+                )
+            );
         }
 
         function deleteNote(id) {
@@ -237,6 +270,7 @@ export function DataProvider({ children }) {
                 addTask,
                 toggleTask,
                 deleteTask,
+                updateTask,
 
                 goals,
                 addGoal,
@@ -261,6 +295,7 @@ export function DataProvider({ children }) {
 
                 notes,
                 addNote,
+                updateNote,
                 deleteNote
             }}
         >
