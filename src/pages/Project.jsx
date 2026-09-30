@@ -8,7 +8,8 @@ function Projects() {
         addProject,
         deleteProject,
         toggleProject,
-        updateProjectStatus
+        updateProjectStatus,
+        recordActivity
     } = useContext(DataContext);
 
     const [project, setProject] = useState("");
@@ -58,85 +59,90 @@ function Projects() {
                 <button onClick={handleAddProject}>
                     Add Project
                 </button>
-                </div>
 
-                <div className="project-list">
+            </div>
 
-                    {projects.map((project) => (
+            <div className="project-list">
 
-                        <div
-                            className="project-item"
-                            key={project.id}
-                        >
+                {projects.map((project) => (
 
-                            <div className="project-left">
+                    <div
+                        className="project-item"
+                        key={project.id}
+                    >
 
-                                <input
-                                    type="checkbox"
-                                    checked={project.completed}
-                                    onChange={() =>
-                                        toggleProject(project.id)
+                        <div className="project-left">
+
+                            <input
+                                type="checkbox"
+                                checked={project.completed}
+                                onChange={() => {
+                                    toggleProject(project.id);
+
+                                    if (!project.completed) {
+                                        recordActivity();
                                     }
-                                />
+                                }}
+                            />
 
-                                <div className="project-info">
+                            <div className="project-info">
 
-                                    <span
-                                        className={
-                                            project.completed
-                                                ? "completed"
-                                                : ""
-                                        }
-                                    >
-                                        {project.name}
-                                    </span>
+                                <span
+                                    className={
+                                        project.completed
+                                            ? "completed"
+                                            : ""
+                                    }
+                                >
+                                    {project.name}
+                                </span>
 
-                                    <p>
-                                        {project.description}
-                                    </p>
+                                <p>
+                                    {project.description}
+                                </p>
 
-                                    <select
-                                        value={project.status}
-                                        onChange={(e) =>
-                                            updateProjectStatus(
-                                                project.id,
-                                                e.target.value
-                                            )
-                                        }
-                                    >
-                                        <option value="Not Started">
-                                            Not Started
-                                        </option>
+                                <select
+                                    value={project.status}
+                                    onChange={(e) =>
+                                        updateProjectStatus(
+                                            project.id,
+                                            e.target.value
+                                        )
+                                    }
+                                >
+                                    <option value="Not Started">
+                                        Not Started
+                                    </option>
 
-                                        <option value="In Progress">
-                                            In Progress
-                                        </option>
+                                    <option value="In Progress">
+                                        In Progress
+                                    </option>
 
-                                        <option value="Completed">
-                                            Completed
-                                        </option>
-                                    </select>
-
-                                </div>
+                                    <option value="Completed">
+                                        Completed
+                                    </option>
+                                </select>
 
                             </div>
 
-                            <button
-                                className="delete-btn"
-                                onClick={() =>
-                                    deleteProject(project.id)
-                                }
-                            >
-                                Delete
-                            </button>
-
                         </div>
 
-                    ))}
+                        <button
+                            className="delete-btn"
+                            onClick={() =>
+                                deleteProject(project.id)
+                            }
+                        >
+                            Delete
+                        </button>
 
-                </div>
+                    </div>
+
+                ))}
 
             </div>
+
+        </div>
     );
 }
 

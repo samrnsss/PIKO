@@ -3,15 +3,58 @@ import DataContext from "../context/DataContext";
 
 function Goals() {
 
-    const {goals,addGoal,toggleGoal,deleteGoal} = useContext(DataContext);
+    const {
+        goals,
+        addGoal,
+        updateGoal,
+        toggleGoal,
+        deleteGoal,
+        recordActivity
+    } = useContext(DataContext);
 
     const [goal, setGoal] = useState("");
+    const [dueDate, setDueDate] = useState("");
+    const [editingGoalId, setEditingGoalId] = useState(null);
 
     function handleAddGoal() {
-        if (goal.trim() === "") return;
+        if (goal.trim() === "") {
+            return;
+        }
 
-        addGoal(goal);
+        addGoal({
+            text: goal,
+            dueDate
+        });
+
         setGoal("");
+        setDueDate("");
+    }
+
+    function handleEditGoal(goal) {
+        setGoal(goal.text);
+        setDueDate(goal.dueDate || "");
+        setEditingGoalId(goal.id);
+    }
+
+    function handleUpdateGoal() {
+        if (goal.trim() === "") {
+            return;
+        }
+
+        updateGoal(editingGoalId, {
+            text: goal,
+            dueDate
+        });
+
+        setGoal("");
+        setDueDate("");
+        setEditingGoalId(null);
+    }
+
+    function handleCancelEdit() {
+        setGoal("");
+        setDueDate("");
+        setEditingGoalId(null);
     }
 
     return (
@@ -26,6 +69,12 @@ function Goals() {
             <div className="goal-input">
 
                 <input
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                />
+
+                <input
                     type="text"
                     value={goal}
                     placeholder="Add a new goal..."
@@ -37,9 +86,24 @@ function Goals() {
                     }}
                 />
 
-                <button onClick={handleAddGoal}>
-                    Add Goal
-                </button>
+                {editingGoalId === null ? (
+                    <button onClick={handleAddGoal}>
+                        Add Goal
+                    </button>
+                ) : (
+                    <>
+                        <button onClick={handleUpdateGoal}>
+                            Update Goal
+                        </button>
+
+                        <button
+                            className="cancel-btn"
+                            onClick={handleCancelEdit}
+                        >
+                            Cancel
+                        </button>
+                    </>
+                )}
 
             </div>
 
@@ -54,7 +118,12 @@ function Goals() {
                             <input
                                 type="checkbox"
                                 checked={goal.completed}
-                                onChange={() => toggleGoal(goal.id)}
+                                onChange={() => {toggleGoal(goal.id);
+
+                                    if(!goal.completed){
+                                        recordActivity();
+                                    }
+                            }}
                             />
 
                             <span
@@ -64,22 +133,31 @@ function Goals() {
                             >
                                 {goal.text}
                             </span>
-
+                                {goal.dueDate && (
+                                    <span className="goal-due-date">
+                                        Due: {new Date(
+                                            goal.dueDate + "T00:00:00"
+                                        ).toLocaleDateString()}
+                                    </span>
+                                )}
                         </div>
-
-                        <button
-                            className="delete-btn"
-                            onClick={() => deleteGoal(goal.id)}
-                        >
-                            Delete
-                        </button>
-
+                        <div className="goal-actions">
+                            <button
+                                className="edit-btn"
+                                onClick={() => handleEditGoal(goal)}
+                            >
+                                Edit
+                            </button>
+                            <button
+                                className="delete-btn"
+                                onClick={() => deleteGoal(goal.id)}
+                            >
+                                Delete
+                            </button>
+                        </div>
                     </div>
-
                 ))}
-
             </div>
-
         </div>
     );
 }

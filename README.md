@@ -1,4 +1,4 @@
-# PIKO 🧠✨
+# PIKO
 
 PIKO is a personal productivity and life-management dashboard designed to bring different aspects of everyday life into one organized space.
 

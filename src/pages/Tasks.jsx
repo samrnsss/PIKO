@@ -3,7 +3,7 @@ import DataContext from "../context/DataContext";
 
 function Tasks() {
 
-    const { tasks, addTask,updateTask, toggleTask, deleteTask } = useContext(DataContext);
+    const { tasks, addTask,updateTask, toggleTask, deleteTask, recordActivity} = useContext(DataContext);
 
     const [task, setTask] = useState("");
     const [priority, setPriority] = useState("Medium");
@@ -15,7 +15,7 @@ function Tasks() {
         if (task.trim() === "") {
             return;
         }
-
+        
         addTask({ text: task, priority, dueDate });
         setTask("");
         setPriority("Medium");
@@ -27,7 +27,7 @@ function Tasks() {
             return !task.completed;
         }
 
-        if(filter == "Completed"){
+        if(filter === "Completed"){
             return task.completed;
         }
 
@@ -179,7 +179,13 @@ function Tasks() {
                             <input
                                 type="checkbox"
                                 checked={task.completed}
-                                onChange={() => toggleTask(task.id)}
+                                onChange={() => {
+                                    toggleTask(task.id);
+                                    
+                                    if(!task.completed){
+                                        recordActivity(`Completed task: "${task.text}"`);
+                                    }
+                                }}
                             />
 
                             <div className="task-info">

@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-function Sidebar() {
+function Sidebar({ setSearchOpen, setSearchTerm }) {
 
     const menuItems = [
         { name: "Dashboard", path: "/" },
@@ -15,21 +15,30 @@ function Sidebar() {
     return (
         <aside className="sidebar">
 
-        <h2 className="logo">PIKO</h2>
+            <h2 className="logo">PIKO</h2>
 
-        <nav>
-            {menuItems.map((item) => (
-            <NavLink
-                to={item.path}
-                className={({ isActive }) =>
-                    isActive ? "nav-item active" : "nav-item"
-                }
-                key={item.path}
-            >
-                {item.name}
-            </NavLink>
-            ))}
-        </nav>
+            <nav>
+                {menuItems.map((item) => (
+                    <NavLink
+                        to={item.path}
+
+                        onClick={() => {
+                            setSearchOpen(false);
+                            setSearchTerm("");
+                        }}
+
+                        className={({ isActive }) =>
+                            isActive
+                                ? "nav-item active"
+                                : "nav-item"
+                        }
+
+                        key={item.path}
+                    >
+                        {item.name}
+                    </NavLink>
+                ))}
+            </nav>
 
         </aside>
     );

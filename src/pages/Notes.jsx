@@ -7,14 +7,14 @@ function Notes() {
         notes,
         addNote,
         updateNote,
-        deleteNote
+        deleteNote,
+        recordActivity
     } = useContext(DataContext);
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [editingNoteId, setEditingNoteId] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-
 
     function handleAddNote() {
 
@@ -27,10 +27,11 @@ function Notes() {
             content
         });
 
+        recordActivity();
+
         setTitle("");
         setContent("");
     }
-
 
     function handleEditNote(note) {
 
@@ -39,7 +40,6 @@ function Notes() {
 
         setEditingNoteId(note.id);
     }
-
 
     function handleUpdateNote() {
 
@@ -52,11 +52,12 @@ function Notes() {
             content
         });
 
+        recordActivity();
+
         setTitle("");
         setContent("");
         setEditingNoteId(null);
     }
-
 
     function handleCancelEdit() {
 
@@ -66,97 +67,133 @@ function Notes() {
     }
 
     const filteredNotes = notes.filter((note) =>
-    note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    note.content.toLowerCase().includes(searchTerm.toLowerCase())
-);
+        note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        note.content.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div className="notes-page">
 
             <h1>Notes</h1>
+
             <p className="page-subtitle">
-                Write down your thoughts and ideas.
+                Capture thoughts, ideas, lists, and anything on your mind.
             </p>
+
             <div className="note-search">
-            <input
-                type="text"
-                placeholder="Search notes..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
-</div>
+
+                <input
+                    type="text"
+                    placeholder="Search notes..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+
+            </div>
+
             <div className="note-input">
+
                 <input
                     type="text"
                     value={title}
                     placeholder="Note title..."
                     onChange={(e) => setTitle(e.target.value)}
                 />
+
                 <textarea
                     value={content}
                     placeholder="Write your note..."
                     onChange={(e) => setContent(e.target.value)}
                 ></textarea>
+
                 {editingNoteId === null ? (
+
                     <button onClick={handleAddNote}>
                         Add Note
                     </button>
+
                 ) : (
+
                     <div className="note-edit-buttons">
+
                         <button onClick={handleUpdateNote}>
                             Update Note
                         </button>
+
                         <button
                             className="cancel-btn"
                             onClick={handleCancelEdit}
                         >
                             Cancel
                         </button>
+
                     </div>
-                )
-                }
+
+                )}
+
             </div>
+
             <div className="note-list">
+
                 {filteredNotes.map((note) => (
+
                     <div
                         className="note-item"
                         key={note.id}
                     >
+
                         <div className="note-info">
+
                             <h3>{note.title}</h3>
+
                             <span className="note-date">
+
                                 {note.createdAt
                                     ? new Date(
                                         note.createdAt
                                     ).toLocaleString()
-                                    : "Date unavailable"}
-                                    {note.updatedAt && (
+                                    : "Date unavailable"
+                                }
+
+                            </span>
+
+                            {note.updatedAt && (
                                 <span className="note-date">
-                                    Last edited: {new Date(note.updatedAt).toLocaleString()}
+                                    Last edited:{" "}
+                                    {new Date(
+                                        note.updatedAt
+                                    ).toLocaleString()}
                                 </span>
                             )}
-                                    
-                            </span>
-                            
+
                             <p>{note.content}</p>
+
                         </div>
+
                         <div className="note-actions">
+
                             <button
                                 className="edit-btn"
                                 onClick={() => handleEditNote(note)}
                             >
                                 Edit
                             </button>
+
                             <button
                                 className="delete-btn"
                                 onClick={() => deleteNote(note.id)}
                             >
                                 Delete
                             </button>
+
                         </div>
+
                     </div>
+
                 ))}
+
             </div>
+
         </div>
     );
 }

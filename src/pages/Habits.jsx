@@ -3,68 +3,140 @@ import DataContext from "../context/DataContext";
 
 function Habits() {
 
-    const {habits, addHabit, toggleHabit, deleteHabit} = useContext(DataContext);
+    const {
+        habits,
+        addHabit,
+        updateHabit,
+        toggleHabit,
+        deleteHabit,
+        recordActivity
+    } = useContext(DataContext);
 
     const [habit, setHabit] = useState("");
+    const [editingHabitId, setEditingHabitId] = useState(null);
 
     function handleAddHabit() {
-        if (habit.trim() === "") return;
+        if (habit.trim() === "") {
+            return;
+        }
 
         addHabit(habit);
         setHabit("");
     }
 
+    function handleEditHabit(habit) {
+        setHabit(habit.name);
+        setEditingHabitId(habit.id);
+    }
+
+    function handleUpdateHabit() {
+        if (habit.trim() === "") {
+            return;
+        }
+
+        updateHabit(editingHabitId, {
+            name: habit
+        });
+
+        setHabit("");
+        setEditingHabitId(null);
+    }
+
+    function handleCancelEdit() {
+        setHabit("");
+        setEditingHabitId(null);
+    }
+
     return (
         <div className="habit-page">
+
             <h1>Habits</h1>
-                <div className="habit-input">
-                    <input 
-                        type="text"
-                        value={habit}
-                        placeholder="Add a new habit..."
-                        onChange={(e) => setHabit(e.target.value)}
-                        onKeyDown={(e) => {
+
+            <div className="habit-input">
+
+                <input
+                    type="text"
+                    value={habit}
+                    placeholder="Add a new habit..."
+                    onChange={(e) => setHabit(e.target.value)}
+                    onKeyDown={(e) => {
                         if (e.key === "Enter") {
-                            handleAddHabit();
+                            if (editingHabitId !== null) {
+                                handleUpdateHabit();
+                            } else {
+                                handleAddHabit();
+                            }
                         }
                     }}
-                    />
+                />
+
+                {editingHabitId === null ? (
                     <button onClick={handleAddHabit}>
                         Add Habit
                     </button>
-                </div>
+                ) : (
+                    <>
+                        <button onClick={handleUpdateHabit}>
+                            Update Habit
+                        </button>
 
-        <div className="habit-list">
-            {habits.map((habit) => (
+                        <button
+                            className="cancel-btn"
+                            onClick={handleCancelEdit}
+                        >
+                            Cancel
+                        </button>
+                    </>
+                )}
+            </div>
+            <div className="habit-list">
+                {habits.map((habit) => (
+                    <div className="habit-item" key={habit.id}>
+                        <div className="habit-left">
+                            <input
+                                type="checkbox"
+                                checked={habit.completed}
+                                onChange={() => {
+                                    toggleHabit(habit.id);
+                                    if (!habit.completed) {
+                                        recordActivity();
+                                    }
+                                }}
+                            />
+                            <span
+                                className={
+                                    habit.completed
+                                        ? "completed"
+                                        : ""
+                                }
+                            >
+                                {habit.name}
+                            </span>
+                        </div>
+                        <div className="habit-actions">
+                            <button
+                                className="edit-btn"
+                                onClick={() => handleEditHabit(habit)}
+                            >
+                                Edit
+                            </button>
+                            <button
+                                className="delete-btn"
+                                onClick={() => deleteHabit(habit.id)}
+                            >
+                                Delete
+                            </button>
 
-        <div className="habit-item" key={habit.id}>
+                        </div>
 
-            <div className="habit-left">
+                    </div>
 
-                <input
-                    type="checkbox"
-                    checked={habit.completed}
-                    onChange={() => toggleHabit(habit.id)}
-                />
-
-                <span className={habit.completed ? "completed" : ""}>
-                    {habit.name}
-                </span>
+                ))}
 
             </div>
 
-            <button
-                className="delete-btn"
-                onClick={() => deleteHabit(habit.id)}
-            >
-                Delete
-            </button>
-
         </div>
-
-    ))}
-</div>
-</div>
     );
 }
+
 export default Habits;

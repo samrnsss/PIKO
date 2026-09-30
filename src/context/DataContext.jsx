@@ -4,6 +4,25 @@ const DataContext = createContext();
 
 export function DataProvider({ children }) {
 
+    // ACTIVITY
+const [activity, setActivity] = useState(() => {
+    const savedActivity = localStorage.getItem("activity");
+    return savedActivity ? JSON.parse(savedActivity) : {};
+});
+
+useEffect(() => {
+    localStorage.setItem("activity", JSON.stringify(activity));
+}, [activity]);
+
+function recordActivity() {
+    const today = new Date().toISOString().split("T")[0];
+
+    setActivity((prevActivity) => ({
+        ...prevActivity,
+        [today]: (prevActivity[today] || 0) + 1
+    }));
+}
+
     // TASKS
     const [tasks, setTasks] = useState(() => {
         const savedTasks = localStorage.getItem("tasks");
@@ -71,12 +90,26 @@ export function DataProvider({ children }) {
     function addGoal(goal) {
         const newGoal = {
             id: Date.now(),
-            text: goal,
+            text: goal.text,
+            dueDate: goal.dueDate,
             completed: false
         };
 
         setGoals((prevGoals) => [...prevGoals, newGoal]);
     }
+    function updateGoal(id, updatedGoal) {
+    setGoals((prevGoals) =>
+        prevGoals.map((goal) =>
+            goal.id === id
+                ? {
+                    ...goal,
+                    text: updatedGoal.text,
+                    dueDate: updatedGoal.dueDate
+                }
+                : goal
+        )
+    );
+}
 
     function toggleGoal(id) {
         setGoals((prevGoals) =>
@@ -114,6 +147,19 @@ export function DataProvider({ children }) {
         setHabits((prevHabits) => [...prevHabits, newHabit]);
     }
 
+    function updateHabit(id, updatedHabit) {
+    setHabits((prevHabits) =>
+        prevHabits.map((habit) =>
+            habit.id === id
+                ? {
+                    ...habit,
+                    name: updatedHabit.name
+                }
+                : habit
+        )
+    );
+}
+
     function toggleHabit(id) {
         setHabits((prevHabits) =>
             prevHabits.map((habit) =>
@@ -148,6 +194,16 @@ export function DataProvider({ children }) {
             };
 
             setTopics((prevTopics) => [...prevTopics, newTopic]);
+        }
+
+        function updateTopic(id, updatedTopic) {
+            setTopics((prevTopics) =>
+                prevTopics.map((topic) =>
+                    topic.id === id
+                        ? { ...topic, name: updatedTopic.name }
+                        : topic
+                )
+            );
         }
 
         function toggleTopic(id) {
@@ -266,6 +322,9 @@ export function DataProvider({ children }) {
     return (
         <DataContext.Provider
             value={{
+                activity,
+                recordActivity,
+
                 tasks,
                 addTask,
                 toggleTask,
@@ -274,16 +333,19 @@ export function DataProvider({ children }) {
 
                 goals,
                 addGoal,
+                updateGoal,
                 toggleGoal,
                 deleteGoal,
 
                 habits,
                 addHabit,
+                updateHabit,
                 toggleHabit,
                 deleteHabit,
 
                 topics,
                 addTopic,
+                updateTopic,
                 toggleTopic,
                 deleteTopic,
 
@@ -300,8 +362,10 @@ export function DataProvider({ children }) {
             }}
         >
             {children}
+            
         </DataContext.Provider>
     );
 }
+
 
 export default DataContext;
