@@ -2,7 +2,8 @@ import { useState, useContext } from "react";
 import {
     BrowserRouter,
     Routes,
-    Route
+    Route,
+    useNavigate
 } from "react-router-dom";
 
 import { DataProvider } from "./context/DataContext";
@@ -21,6 +22,8 @@ import Notes from "./pages/Notes";
 
 
 function AppContent() {
+
+    const navigate = useNavigate();
 
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
@@ -55,7 +58,8 @@ function AppContent() {
 
                 searchResults.push({
                     type: "Task",
-                    title: task.text
+                    title: task.text,
+                    path: "/tasks"
                 });
 
             }
@@ -73,7 +77,8 @@ function AppContent() {
 
                 searchResults.push({
                     type: "Goal",
-                    title: goal.text
+                    title: goal.text,
+                    path: "/goals"
                 });
 
             }
@@ -91,7 +96,8 @@ function AppContent() {
 
                 searchResults.push({
                     type: "Habit",
-                    title: habit.name
+                    title: habit.name,
+                    path: "/habits"
                 });
 
             }
@@ -109,7 +115,8 @@ function AppContent() {
 
                 searchResults.push({
                     type: "Learning",
-                    title: topic.name
+                    title: topic.name,
+                    path: "/learning"
                 });
 
             }
@@ -133,7 +140,8 @@ function AppContent() {
 
                 searchResults.push({
                     type: "Project",
-                    title: project.name
+                    title: project.name,
+                    path: "/projects"
                 });
 
             }
@@ -157,7 +165,8 @@ function AppContent() {
 
                 searchResults.push({
                     type: "Note",
-                    title: note.title
+                    title: note.title,
+                    path: "/notes"
                 });
 
             }
@@ -232,6 +241,11 @@ function AppContent() {
                                             <div
                                                 className="search-result"
                                                 key={index}
+                                                onClick={() => {
+                                                    setSearchOpen(false);
+                                                    setSearchTerm("");
+                                                    navigate(result.path);
+                                                }}
                                             >
 
                                                 <span className="search-type">

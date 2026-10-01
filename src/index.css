@@ -1291,6 +1291,7 @@ textarea::placeholder {
 
 .search-result {
     padding: 18px 20px;
+    cursor: pointer;
 
     background-color: var(--card-color);
     border: 1px solid var(--border-color);
