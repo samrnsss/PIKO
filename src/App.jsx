@@ -59,7 +59,8 @@ function AppContent() {
                 searchResults.push({
                     type: "Task",
                     title: task.text,
-                    path: "/tasks"
+                    path: "/tasks",
+                    id: task.id
                 });
 
             }
@@ -78,7 +79,8 @@ function AppContent() {
                 searchResults.push({
                     type: "Goal",
                     title: goal.text,
-                    path: "/goals"
+                    path: "/goals",
+                    id: goal.id
                 });
 
             }
@@ -97,6 +99,7 @@ function AppContent() {
                 searchResults.push({
                     type: "Habit",
                     title: habit.name,
+                    id: habit.id,
                     path: "/habits"
                 });
 
@@ -116,6 +119,7 @@ function AppContent() {
                 searchResults.push({
                     type: "Learning",
                     title: topic.name,
+                    id: topic.id,
                     path: "/learning"
                 });
 
@@ -140,6 +144,7 @@ function AppContent() {
 
                 searchResults.push({
                     type: "Project",
+                    id: project.id,
                     title: project.name,
                     path: "/projects"
                 });
@@ -166,6 +171,7 @@ function AppContent() {
                 searchResults.push({
                     type: "Note",
                     title: note.title,
+                    id: note.id,
                     path: "/notes"
                 });
 
@@ -244,7 +250,7 @@ function AppContent() {
                                                 onClick={() => {
                                                     setSearchOpen(false);
                                                     setSearchTerm("");
-                                                    navigate(result.path);
+                                                    navigate(`${result.path}?id=${result.id}`);
                                                 }}
                                             >
 

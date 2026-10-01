@@ -1,7 +1,34 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import DataContext from "../context/DataContext";
 
 function Tasks() {
+
+    const [searchParams] = useSearchParams();
+    const selectedTaskId = searchParams.get("id");
+
+    useEffect(() => {
+
+    if (!selectedTaskId) return;
+
+    const element = document.getElementById(
+        `task-${selectedTaskId}`
+    );
+
+    if (element) {
+        element.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+        element.classList.add("search-highlight");
+
+        setTimeout(() => {
+            element.classList.remove("search-highlight");
+        }, 2000);
+    }
+
+}, [selectedTaskId]);
 
     const { tasks, addTask,updateTask, toggleTask, deleteTask, recordActivity} = useContext(DataContext);
 
@@ -172,7 +199,9 @@ function Tasks() {
 
                 {filteredTasks.map((task) => (
 
-                    <div className="task-item" key={task.id}>
+                    <div className="task-item" 
+                    id={`task-${task.id}`}
+                    key={task.id}>
 
                         <div className="task-left">
 

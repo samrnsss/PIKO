@@ -1,4 +1,5 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect} from "react";
+import { useSearchParams } from "react-router-dom";
 import DataContext from "../context/DataContext";
 
 function Goals() {
@@ -11,6 +12,32 @@ function Goals() {
         deleteGoal,
         recordActivity
     } = useContext(DataContext);
+
+    const [searchParams] = useSearchParams();
+const selectedGoalId = searchParams.get("id");
+
+useEffect(() => {
+
+    if (!selectedGoalId) return;
+
+    const element = document.getElementById(
+        `goal-${selectedGoalId}`
+    );
+
+    if (element) {
+        element.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+        element.classList.add("search-highlight");
+
+        setTimeout(() => {
+            element.classList.remove("search-highlight");
+        }, 2000);
+    }
+
+}, [selectedGoalId]);
 
     const [goal, setGoal] = useState("");
     const [dueDate, setDueDate] = useState("");
@@ -111,7 +138,9 @@ function Goals() {
 
                 {goals.map((goal) => (
 
-                    <div className="goal-item" key={goal.id}>
+                    <div className="goal-item" 
+                    id={`goal-${goal.id}`}
+                    key={goal.id}>
 
                         <div className="goal-left">
 

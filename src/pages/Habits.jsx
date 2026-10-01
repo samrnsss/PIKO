@@ -1,4 +1,5 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import DataContext from "../context/DataContext";
 
 function Habits() {
@@ -14,6 +15,32 @@ function Habits() {
 
     const [habit, setHabit] = useState("");
     const [editingHabitId, setEditingHabitId] = useState(null);
+
+    const [searchParams] = useSearchParams();
+const selectedHabitId = searchParams.get("id");
+
+useEffect(() => {
+
+    if (!selectedHabitId) return;
+
+    const element = document.getElementById(
+        `habit-${selectedHabitId}`
+    );
+
+    if (element) {
+        element.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+        element.classList.add("search-highlight");
+
+        setTimeout(() => {
+            element.classList.remove("search-highlight");
+        }, 2000);
+    }
+
+}, [selectedHabitId]);
 
     function handleAddHabit() {
         if (habit.trim() === "") {
@@ -91,7 +118,9 @@ function Habits() {
             </div>
             <div className="habit-list">
                 {habits.map((habit) => (
-                    <div className="habit-item" key={habit.id}>
+                    <div className="habit-item" 
+                    id={`habit-${habit.id}`}
+                    key={habit.id}>
                         <div className="habit-left">
                             <input
                                 type="checkbox"

@@ -1,4 +1,5 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect} from "react";
+import { useSearchParams } from "react-router-dom";
 import DataContext from "../context/DataContext";
 
 function Notes() {
@@ -10,6 +11,32 @@ function Notes() {
         deleteNote,
         recordActivity
     } = useContext(DataContext);
+
+    const [searchParams] = useSearchParams();
+const selectedProjectId = searchParams.get("id");
+
+useEffect(() => {
+
+    if (!selectedProjectId) return;
+
+    const element = document.getElementById(
+        `project-${selectedProjectId}`
+    );
+
+    if (element) {
+        element.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+        element.classList.add("search-highlight");
+
+        setTimeout(() => {
+            element.classList.remove("search-highlight");
+        }, 2000);
+    }
+
+}, [selectedProjectId]);
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");

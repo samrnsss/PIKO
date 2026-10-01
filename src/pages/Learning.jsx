@@ -1,5 +1,6 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect} from "react";
 import DataContext from "../context/DataContext";
+import { useSearchParams } from "react-router-dom";
 
 function Learning() {
     const {
@@ -10,6 +11,32 @@ function Learning() {
         deleteTopic,
         recordActivity
     } = useContext(DataContext);
+
+    const [searchParams] = useSearchParams();
+const selectedTopicId = searchParams.get("id");
+
+useEffect(() => {
+
+    if (!selectedTopicId) return;
+
+    const element = document.getElementById(
+        `learning-${selectedTopicId}`
+    );
+
+    if (element) {
+        element.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+        element.classList.add("search-highlight");
+
+        setTimeout(() => {
+            element.classList.remove("search-highlight");
+        }, 2000);
+    }
+
+}, [selectedTopicId]);
 
     const [topic, setTopic] = useState("");
     const [editingTopicId, setEditingTopicId] = useState(null);
@@ -95,7 +122,9 @@ function Learning() {
 
                 {topics.map((topic) => (
 
-                    <div className="topic-item" key={topic.id}>
+                    <div className="topic-item" 
+                    id={`learning-${topic.id}`}
+                    key={topic.id}>
 
                         <div className="topic-left">
 
