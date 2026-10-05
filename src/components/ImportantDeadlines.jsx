@@ -80,10 +80,6 @@ function ImportantDeadlines() {
 
                 <div>
                     <h2>Important Deadlines</h2>
-
-                    <p>
-                        Tasks and goals that need your attention.
-                    </p>
                 </div>
 
             </div>
@@ -91,7 +87,7 @@ function ImportantDeadlines() {
             {deadlines.length === 0 ? (
 
                 <p className="empty-message">
-                    No important deadlines coming up. 🌱
+                    No important deadlines coming up. You can chilllll!!!.
                 </p>
 
             ) : (

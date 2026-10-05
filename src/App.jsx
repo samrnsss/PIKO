@@ -1,3 +1,9 @@
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
+
 import { useState, useContext } from "react";
 import {
     BrowserRouter,
@@ -328,6 +334,11 @@ function AppContent() {
                             element={<Notes />}
                         />
 
+                        <Route 
+                            path="/profile"
+                            element={<Profile />}
+                        />
+
                     </Routes>
 
                 )}
@@ -342,22 +353,40 @@ function AppContent() {
 
 
 function App() {
-
     return (
-
-        <DataProvider>
+        <AuthProvider>
 
             <BrowserRouter>
 
-                <AppContent />
+                <Routes>
+
+                    <Route
+                        path="/signup"
+                        element={<Signup />}
+                    />
+
+                    <Route
+                        path="/login"
+                        element={<Login />}
+                    />
+
+                    <Route
+                        path="/*"
+                        element={
+                            <ProtectedRoute>
+                                <DataProvider>
+                                    <AppContent />
+                                </DataProvider>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                </Routes>
 
             </BrowserRouter>
 
-        </DataProvider>
-
+        </AuthProvider>
     );
-
 }
-
 
 export default App;

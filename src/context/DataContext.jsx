@@ -1,37 +1,89 @@
 import { createContext, useEffect, useState } from "react";
+import { useAuth } from "./useAuth";
 
 const DataContext = createContext();
 
-export function DataProvider({ children }) {
-
-    // ACTIVITY
-const [activity, setActivity] = useState(() => {
-    const savedActivity = localStorage.getItem("activity");
-    return savedActivity ? JSON.parse(savedActivity) : {};
-});
-
-useEffect(() => {
-    localStorage.setItem("activity", JSON.stringify(activity));
-}, [activity]);
-
-function recordActivity() {
-    const today = new Date().toISOString().split("T")[0];
-
-    setActivity((prevActivity) => ({
-        ...prevActivity,
-        [today]: (prevActivity[today] || 0) + 1
-    }));
+function getStorageKey(email) {
+    return `piko_data_${encodeURIComponent(email.toLowerCase())}`;
 }
 
-    // TASKS
-    const [tasks, setTasks] = useState(() => {
-        const savedTasks = localStorage.getItem("tasks");
-        return savedTasks ? JSON.parse(savedTasks) : [];
-    });
+const emptyData = {
+    activity: {},
+    tasks: [],
+    goals: [],
+    habits: [],
+    topics: [],
+    projects: [],
+    notes: []
+};
 
-    useEffect(() => {
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-    }, [tasks]);
+export function DataProvider({ children }) {
+    const { user } = useAuth();
+
+    function loadUserData(email) {
+    if (!email) {
+        return emptyData;
+    }
+
+    const key = getStorageKey(email);
+    const savedData = localStorage.getItem(key);
+
+    if (!savedData) {
+        return emptyData;
+    }
+
+    try {
+        return {
+            ...emptyData,
+            ...JSON.parse(savedData)
+        };
+    } catch {
+        return emptyData;
+    }
+}
+
+const [data, setData] = useState(() =>
+    loadUserData(user?.email)
+);
+
+// =========================
+// SAVE USER DATA
+// =========================
+
+useEffect(() => {
+    if (!user?.email) {
+        return;
+    }
+
+    const key = getStorageKey(user.email);
+
+    localStorage.setItem(
+        key,
+        JSON.stringify(data)
+    );
+}, [data, user?.email]);
+
+    // =========================
+    // ACTIVITY
+    // =========================
+
+    function recordActivity() {
+        const today =
+            new Date().toISOString().split("T")[0];
+
+        setData((prev) => ({
+            ...prev,
+            activity: {
+                ...prev.activity,
+                [today]:
+                    (prev.activity[today] || 0) + 1
+            }
+        }));
+    }
+
+    // =========================
+    // TASKS
+    // =========================
 
     function addTask(task) {
         const newTask = {
@@ -42,50 +94,54 @@ function recordActivity() {
             completed: false
         };
 
-        setTasks((prevTasks) => [...prevTasks, newTask]);
+        setData((prev) => ({
+            ...prev,
+            tasks: [...prev.tasks, newTask]
+        }));
     }
 
     function updateTask(id, updatedTask) {
-    setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-            task.id === id
-                ? {
-                    ...task,
-                    text: updatedTask.text,
-                    priority: updatedTask.priority,
-                    dueDate: updatedTask.dueDate
-                }
-                : task
-        )
-    );
-}
-
-    function toggleTask(id) {
-        setTasks((prevTasks) =>
-            prevTasks.map((task) =>
+        setData((prev) => ({
+            ...prev,
+            tasks: prev.tasks.map((task) =>
                 task.id === id
-                    ? { ...task, completed: !task.completed }
+                    ? {
+                        ...task,
+                        text: updatedTask.text,
+                        priority: updatedTask.priority,
+                        dueDate: updatedTask.dueDate
+                    }
                     : task
             )
-        );
+        }));
+    }
+
+    function toggleTask(id) {
+        setData((prev) => ({
+            ...prev,
+            tasks: prev.tasks.map((task) =>
+                task.id === id
+                    ? {
+                        ...task,
+                        completed: !task.completed
+                    }
+                    : task
+            )
+        }));
     }
 
     function deleteTask(id) {
-        setTasks((prevTasks) =>
-            prevTasks.filter((task) => task.id !== id)
-        );
+        setData((prev) => ({
+            ...prev,
+            tasks: prev.tasks.filter(
+                (task) => task.id !== id
+            )
+        }));
     }
 
-
+    // =========================
     // GOALS
-    const [goals, setGoals] = useState(() => {
-        const savedGoals = localStorage.getItem("goals");
-        return savedGoals ? JSON.parse(savedGoals) : [];
-    });
-
-    useEffect(() => {
-        localStorage.setItem("goals", JSON.stringify(goals));
-    }, [goals]);
+    // =========================
 
     function addGoal(goal) {
         const newGoal = {
@@ -95,47 +151,53 @@ function recordActivity() {
             completed: false
         };
 
-        setGoals((prevGoals) => [...prevGoals, newGoal]);
+        setData((prev) => ({
+            ...prev,
+            goals: [...prev.goals, newGoal]
+        }));
     }
-    function updateGoal(id, updatedGoal) {
-    setGoals((prevGoals) =>
-        prevGoals.map((goal) =>
-            goal.id === id
-                ? {
-                    ...goal,
-                    text: updatedGoal.text,
-                    dueDate: updatedGoal.dueDate
-                }
-                : goal
-        )
-    );
-}
 
-    function toggleGoal(id) {
-        setGoals((prevGoals) =>
-            prevGoals.map((goal) =>
+    function updateGoal(id, updatedGoal) {
+        setData((prev) => ({
+            ...prev,
+            goals: prev.goals.map((goal) =>
                 goal.id === id
-                    ? { ...goal, completed: !goal.completed }
+                    ? {
+                        ...goal,
+                        text: updatedGoal.text,
+                        dueDate: updatedGoal.dueDate
+                    }
                     : goal
             )
-        );
+        }));
+    }
+
+    function toggleGoal(id) {
+        setData((prev) => ({
+            ...prev,
+            goals: prev.goals.map((goal) =>
+                goal.id === id
+                    ? {
+                        ...goal,
+                        completed: !goal.completed
+                    }
+                    : goal
+            )
+        }));
     }
 
     function deleteGoal(id) {
-        setGoals((prevGoals) =>
-            prevGoals.filter((goal) => goal.id !== id)
-        );
+        setData((prev) => ({
+            ...prev,
+            goals: prev.goals.filter(
+                (goal) => goal.id !== id
+            )
+        }));
     }
 
+    // =========================
     // HABITS
-    const [habits, setHabits] = useState(() => {
-        const savedHabits = localStorage.getItem("habits");
-        return savedHabits ? JSON.parse(savedHabits) : [];
-    });
-
-    useEffect(() => {
-        localStorage.setItem("habits", JSON.stringify(habits));
-    }, [habits]);
+    // =========================
 
     function addHabit(habit) {
         const newHabit = {
@@ -144,228 +206,250 @@ function recordActivity() {
             completed: false
         };
 
-        setHabits((prevHabits) => [...prevHabits, newHabit]);
+        setData((prev) => ({
+            ...prev,
+            habits: [...prev.habits, newHabit]
+        }));
     }
 
     function updateHabit(id, updatedHabit) {
-    setHabits((prevHabits) =>
-        prevHabits.map((habit) =>
-            habit.id === id
-                ? {
-                    ...habit,
-                    name: updatedHabit.name
-                }
-                : habit
-        )
-    );
-}
-
-    function toggleHabit(id) {
-        setHabits((prevHabits) =>
-            prevHabits.map((habit) =>
+        setData((prev) => ({
+            ...prev,
+            habits: prev.habits.map((habit) =>
                 habit.id === id
-                    ? { ...habit, completed: !habit.completed }
+                    ? {
+                        ...habit,
+                        name: updatedHabit.name
+                    }
                     : habit
             )
-        );
+        }));
+    }
+
+    function toggleHabit(id) {
+        setData((prev) => ({
+            ...prev,
+            habits: prev.habits.map((habit) =>
+                habit.id === id
+                    ? {
+                        ...habit,
+                        completed: !habit.completed
+                    }
+                    : habit
+            )
+        }));
     }
 
     function deleteHabit(id) {
-        setHabits((prevHabits) =>
-            prevHabits.filter((habit) => habit.id !== id)
-        );
+        setData((prev) => ({
+            ...prev,
+            habits: prev.habits.filter(
+                (habit) => habit.id !== id
+            )
+        }));
     }
 
+    // =========================
     // LEARNING
-        const [topics, setTopics] = useState(() => {
-            const savedTopics = localStorage.getItem("topics");
-            return savedTopics ? JSON.parse(savedTopics) : [];
-        });
+    // =========================
 
-        useEffect(() => {
-            localStorage.setItem("topics", JSON.stringify(topics));
-        }, [topics]);
+    function addTopic(topic) {
+        const newTopic = {
+            id: Date.now(),
+            name: topic,
+            completed: false
+        };
 
-        function addTopic(topic) {
-            const newTopic = {
-                id: Date.now(),
-                name: topic,
-                completed: false
-            };
+        setData((prev) => ({
+            ...prev,
+            topics: [...prev.topics, newTopic]
+        }));
+    }
 
-            setTopics((prevTopics) => [...prevTopics, newTopic]);
-        }
+    function updateTopic(id, updatedTopic) {
+        setData((prev) => ({
+            ...prev,
+            topics: prev.topics.map((topic) =>
+                topic.id === id
+                    ? {
+                        ...topic,
+                        name: updatedTopic.name
+                    }
+                    : topic
+            )
+        }));
+    }
 
-        function updateTopic(id, updatedTopic) {
-            setTopics((prevTopics) =>
-                prevTopics.map((topic) =>
-                    topic.id === id
-                        ? { ...topic, name: updatedTopic.name }
-                        : topic
-                )
-            );
-        }
+    function toggleTopic(id) {
+        setData((prev) => ({
+            ...prev,
+            topics: prev.topics.map((topic) =>
+                topic.id === id
+                    ? {
+                        ...topic,
+                        completed: !topic.completed
+                    }
+                    : topic
+            )
+        }));
+    }
 
-        function toggleTopic(id) {
-            setTopics((prevTopics) =>
-                prevTopics.map((topic) =>
-                    topic.id === id
-                        ? { ...topic, completed: !topic.completed }
-                        : topic
-                )
-            );
-        }
+    function deleteTopic(id) {
+        setData((prev) => ({
+            ...prev,
+            topics: prev.topics.filter(
+                (topic) => topic.id !== id
+            )
+        }));
+    }
 
-        function deleteTopic(id) {
-            setTopics((prevTopics) =>
-                prevTopics.filter((topic) => topic.id !== id)
-            );
-        }
+    // =========================
+    // PROJECTS
+    // =========================
 
-        // PROJECTS
-        const [projects, setProjects] = useState(() => {
-            const savedProjects = localStorage.getItem("projects");
-            return savedProjects ? JSON.parse(savedProjects) : [];
-        });
+    function addProject(project) {
+        const newProject = {
+            id: Date.now(),
+            name: project.name,
+            description: project.description,
+            status: project.status,
+            completed: false
+        };
 
-        useEffect(() => {
-            localStorage.setItem("projects", JSON.stringify(projects));
-        }, [projects]);
+        setData((prev) => ({
+            ...prev,
+            projects: [...prev.projects, newProject]
+        }));
+    }
 
-        function addProject(project) {
-            const newProject = {
-                id: Date.now(),
-                name: project.name,
-                description: project.description,
-                status: project.status,
-                completed: false
-            };
+    function deleteProject(id) {
+        setData((prev) => ({
+            ...prev,
+            projects: prev.projects.filter(
+                (project) => project.id !== id
+            )
+        }));
+    }
 
-            setProjects((prevProjects) => [...prevProjects, newProject]);
-        }
+    function updateProjectStatus(id, status) {
+        setData((prev) => ({
+            ...prev,
+            projects: prev.projects.map((project) =>
+                project.id === id
+                    ? {
+                        ...project,
+                        status
+                    }
+                    : project
+            )
+        }));
+    }
 
-        function deleteProject(id) {
-            setProjects((prevProjects) =>
-                prevProjects.filter((project) => project.id !== id)
-            );
-        }
+    function toggleProject(id) {
+        setData((prev) => ({
+            ...prev,
+            projects: prev.projects.map((project) =>
+                project.id === id
+                    ? {
+                        ...project,
+                        completed:
+                            !project.completed
+                    }
+                    : project
+            )
+        }));
+    }
 
-        function updateProjectStatus(id, status) {
-            setProjects((prevProjects) =>
-                prevProjects.map((project) =>
-                    project.id === id
-                        ? { ...project, status: status }
-                        : project
-                )
-            );
-        }
+    // =========================
+    // NOTES
+    // =========================
 
-        function toggleProject(id) {
-            setProjects((prevProjects) =>
-                prevProjects.map((project) =>
-                    project.id === id
-                        ? {
-                            ...project,
-                            completed: !project.completed
-                        }
-                        : project
-                )
-            );
-        }
+    function addNote(note) {
+        const newNote = {
+            id: Date.now(),
+            title: note.title,
+            content: note.content,
+            createdAt: new Date().toISOString()
+        };
 
-        // NOTES
-        const [notes, setNotes] = useState(() => {
-            const savedNotes = localStorage.getItem("notes");
-            return savedNotes ? JSON.parse(savedNotes) : [];
-        });
+        setData((prev) => ({
+            ...prev,
+            notes: [...prev.notes, newNote]
+        }));
+    }
 
-        useEffect(() => {
-            localStorage.setItem("notes", JSON.stringify(notes));
-        }, [notes]);
+    function updateNote(id, updatedNote) {
+        setData((prev) => ({
+            ...prev,
+            notes: prev.notes.map((note) =>
+                note.id === id
+                    ? {
+                        ...note,
+                        title: updatedNote.title,
+                        content: updatedNote.content,
+                        updatedAt:
+                            new Date().toISOString()
+                    }
+                    : note
+            )
+        }));
+    }
 
-        function addNote(note) {
-            const newNote = {
-                id: Date.now(),
-                title: note.title,
-                content: note.content,
-                createdAt: new Date().toISOString()
-            };
-
-            setNotes((prevNotes) => [
-                ...prevNotes,
-                newNote
-            ]);
-        }
-
-        function updateNote(id, updatedNote) {
-            setNotes((prevNotes) =>
-                prevNotes.map((note) =>
-                    note.id === id
-                        ? {
-                            ...note,
-                            title: updatedNote.title,
-                            content: updatedNote.content,
-                            updatedAt: new Date().toISOString()
-                        }
-                        : note
-                )
-            );
-        }
-
-        function deleteNote(id) {
-            setNotes((prevNotes) =>
-                prevNotes.filter((note) => note.id !== id)
-            );
-        }
+    function deleteNote(id) {
+        setData((prev) => ({
+            ...prev,
+            notes: prev.notes.filter(
+                (note) => note.id !== id
+            )
+        }));
+    }
 
 
     return (
         <DataContext.Provider
             value={{
-                activity,
+                activity: data.activity,
                 recordActivity,
 
-                tasks,
+                tasks: data.tasks,
                 addTask,
                 toggleTask,
                 deleteTask,
                 updateTask,
 
-                goals,
+                goals: data.goals,
                 addGoal,
                 updateGoal,
                 toggleGoal,
                 deleteGoal,
 
-                habits,
+                habits: data.habits,
                 addHabit,
                 updateHabit,
                 toggleHabit,
                 deleteHabit,
 
-                topics,
+                topics: data.topics,
                 addTopic,
                 updateTopic,
                 toggleTopic,
                 deleteTopic,
 
-                projects,
+                projects: data.projects,
                 addProject,
                 deleteProject,
                 updateProjectStatus,
                 toggleProject,
 
-                notes,
+                notes: data.notes,
                 addNote,
                 updateNote,
                 deleteNote
             }}
         >
             {children}
-            
         </DataContext.Provider>
     );
 }
-
 
 export default DataContext;

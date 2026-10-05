@@ -108,6 +108,7 @@ Main Content
 
 .navbar {
     margin-bottom: 40px;
+    min-height: 75px;
 }
 
 .navbar h1 {
@@ -612,7 +613,7 @@ Main Content
 .project-info {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
 }
 
 .project-info > span {
@@ -782,12 +783,191 @@ Main Content
 }
 
 
-/* =========================
-  Responsive
-========================= */
+/* Responsive */
+
 
 @media (max-width: 768px) {
 
+    .main{
+        padding-bottom : 90 px;
+    }
+
+.tasks-page {
+    width: 100%;
+    max-width: none;
+}
+
+.task-input {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+}
+
+.task-input input {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+}
+
+.task-input button {
+    width: 100%;
+}
+
+.task-input select {
+    width: 100%;
+    min-width: 0;
+}
+
+/* Task filters */
+.task-filter {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+}
+
+.task-filter::-webkit-scrollbar {
+    display: none;
+}
+
+.filter-btn {
+    flex-shrink: 0;
+}
+
+/* Individual tasks */
+.task-item {
+    width: 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.task-left {
+    min-width: 0;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.task-actions {
+    flex-shrink: 0;
+}
+
+/* =========================
+   Goals - Mobile
+========================= */
+
+.goals-page {
+    width: 100%;
+    max-width: none;
+}
+
+.goal-input {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+}
+
+.goal-input input {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+}
+
+.goal-input button {
+    width: 100%;
+}
+
+.goal-item {
+    width: 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.goal-left {
+    min-width: 0;
+    flex: 1;
+    flex-wrap: wrap;
+}
+    
+
+    .app {
+        display: block;
+        min-height: 100vh;
+    }
+
+    /* Top horizontal navigation */
+    .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 12px 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .logo {
+        font-size: 22px;
+        margin: 0;
+        flex-shrink: 0;
+    }
+
+    .sidebar nav {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .nav-item {
+        display: inline-block;
+        padding: 8px 12px;
+        margin: 0;
+        border-radius: 8px;
+        white-space: nowrap;
+    }
+
+    /* Main content */
+    .main {
+        width: 100%;
+        padding: 20px 15px;
+    }
+
+    /* Navbar */
+    .navbar {
+        min-height: 65px;
+        margin-bottom: 25px;
+        position: relative;
+    }
+
+    .navbar h1 {
+        font-size: 25px;
+    }
+
+    .navbar p {
+        font-size: 14px;
+    }
+
+    /* Search + Dark Mode */
+    .navbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .search-button,
+    .theme-toggle {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+    }
+
+    /* Dashboard */
     .dashboard {
         grid-template-columns: 1fr;
     }
@@ -809,12 +989,12 @@ Main Content
     }
 
     .task-overview-card {
-    grid-column: auto;
-}
+        grid-column: auto;
+    }
 
     .task-overview {
-    grid-template-columns: repeat(2, 1fr);
-}
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 .note-actions {
@@ -1112,7 +1292,7 @@ Main Content
 }
 
 .deadlines-header p {
-    color: #666;
+    color: var(--secondary-text);
     margin-top: 5px;
 }
 
@@ -1129,7 +1309,8 @@ Main Content
     align-items: center;
     padding: 15px;
     border-radius: 8px;
-    background: #f7f7f7;
+    background: var(--card-color);
+    border: 1px solid var(--border-color);
 }
 
 .deadline-info h3 {
@@ -1138,13 +1319,13 @@ Main Content
 
 .deadline-type {
     font-size: 12px;
-    color: #0c495f;
+    color: var(--accent-color);
     font-weight: 600;
 }
 
 .deadline-date {
     font-size: 13px;
-    color: #666;
+    color: var(--secondary-text);
 }
 
 .deadline-right {
@@ -1164,7 +1345,7 @@ Main Content
 }
 
 .deadline-upcoming {
-    color: #0c495f;
+    color: var(--accent-color);
     font-weight: 600;
 }
 
@@ -1318,4 +1499,699 @@ textarea::placeholder {
 .search-result h3 {
     color: var(--text-color);
     font-size: 18px;
+}
+
+
+/* =====================================================
+   DARK MODE FIXES — paste at the VERY BOTTOM of your CSS
+   (so it overrides the hard-coded white/grey colours above)
+===================================================== */
+
+/* ---------- 1. Extra theme variables ---------- */
+:root {
+    --input-border: #d5d5d5;
+    --muted-bg: #f3f4f6;
+    --accent-soft: #e8f7f9;
+    --accent-contrast: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.08);
+    --danger-color: #ac1111;
+    --badge-low-bg: #e8f5e9;
+    --badge-low-text: #2e7d32;
+    --badge-medium-bg: #fff8e1;
+    --badge-medium-text: #8a6d00;
+    --badge-high-bg: #ffebee;
+    --badge-high-text: #c62828;
+    --activity-empty: #e5e7eb;
+}
+
+[data-theme="dark"] {
+    color-scheme: dark; /* dark dropdowns, date picker, scrollbars */
+    --input-border: #3a3a3a;
+    --muted-bg: #242424;
+    --accent-soft: rgba(117, 203, 216, 0.12);
+    --accent-contrast: #0b1d22;
+    --shadow-color: rgba(0, 0, 0, 0.55);
+    --danger-color: #ff6b6b;
+    --badge-low-bg: rgba(76, 175, 80, 0.18);
+    --badge-low-text: #81c784;
+    --badge-medium-bg: rgba(255, 193, 7, 0.15);
+    --badge-medium-text: #ffd54f;
+    --badge-high-bg: rgba(244, 67, 54, 0.18);
+    --badge-high-text: #ef9a9a;
+    --activity-empty: #2a2a2a;
+}
+
+/* ---------- 2. Inputs, textareas, selects ---------- */
+.task-input input,
+.goal-input input,
+.habit-input input,
+.topic-input input,
+.project-input input,
+.project-input textarea,
+.note-input input,
+.note-input textarea,
+.note-search input,
+.task-input select,
+.project-info select {
+    background-color: var(--input-color);
+    color: var(--text-color);
+    border-color: var(--input-border);
+}
+
+.task-input input:focus,
+.goal-input input:focus,
+.habit-input input:focus,
+.topic-input input:focus,
+.project-input input:focus,
+.project-input textarea:focus,
+.note-input input:focus,
+.note-input textarea:focus,
+.note-search input:focus,
+.task-input select:focus,
+.project-info select:focus {
+    border-color: var(--accent-color);
+}
+
+/* the dropdown list itself (Low / Medium / High, project status) */
+select option {
+    background-color: var(--input-color);
+    color: var(--text-color);
+}
+
+/* ---------- 3. Buttons ---------- */
+.delete-btn {
+    color: var(--danger-color);
+}
+
+.delete-btn:hover {
+    background-color: var(--hover-color);
+    color: var(--danger-color);
+}
+
+.edit-btn {
+    color: var(--accent-color);
+}
+
+.edit-btn:hover {
+    background-color: var(--accent-soft);
+}
+
+.cancel-btn {
+    background-color: var(--card-color);
+    color: var(--secondary-text);
+    border-color: var(--input-border);
+}
+
+.cancel-btn:hover {
+    background-color: var(--hover-color);
+    color: var(--text-color);
+}
+
+/* ---------- 4. Cards: borders + shadows ---------- */
+.goal-item {
+    border-color: var(--border-color);
+}
+
+.task-item:hover,
+.goal-item:hover,
+.habit-item:hover,
+.topic-item:hover,
+.project-item:hover,
+.note-item:hover {
+    box-shadow: 0 6px 16px var(--shadow-color);
+}
+
+.task-overview-card {
+    background-color: var(--card-color);
+    border: 1px solid var(--border-color);
+}
+
+.task-overview-card h2 {
+    color: var(--text-color);
+}
+
+.task-overview strong {
+    color: var(--accent-color);
+}
+
+.task-overview span {
+    color: var(--secondary-text);
+}
+
+/* ---------- 5. Empty states (were hard-coded white) ---------- */
+.task-list:empty::before,
+.goal-list:empty::before,
+.habit-list:empty::before,
+.topic-list:empty::before,
+.project-list:empty::before,
+.note-list:empty::before {
+    background-color: var(--card-color);
+    color: var(--secondary-text);
+    border: 1px dashed var(--border-color);
+}
+
+/* ---------- 6. Task filter tabs ---------- */
+.task-filter {
+    background-color: var(--muted-bg);
+    border: 1px solid var(--border-color);
+}
+
+.filter-btn {
+    color: var(--secondary-text);
+}
+
+.filter-btn:hover {
+    background-color: var(--hover-color);
+    color: var(--accent-color);
+}
+
+.filter-btn.active {
+    background-color: var(--accent-color);
+    color: var(--accent-contrast);
+}
+
+/* ---------- 7. Text colours that were fixed grey ---------- */
+.completed {
+    color: var(--secondary-text);
+    opacity: 0.7;
+}
+
+.task-due-date,
+.goal-due-date,
+.note-date,
+.activity-stats span,
+.activity-legend {
+    color: var(--secondary-text);
+}
+
+.task-status {
+    color: var(--danger-color);
+}
+
+/* ---------- 8. Priority badges ---------- */
+.task-priority.low {
+    background-color: var(--badge-low-bg);
+    color: var(--badge-low-text);
+}
+
+.task-priority.medium {
+    background-color: var(--badge-medium-bg);
+    color: var(--badge-medium-text);
+}
+
+.task-priority.high {
+    background-color: var(--badge-high-bg);
+    color: var(--badge-high-text);
+}
+
+/* ---------- 9. Activity graph ---------- */
+.activity-level-0 {
+    background: var(--activity-empty);
+}
+
+/* ---------- 10. Nav / sidebar polish ---------- */
+.sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: #444 transparent;
+}
+
+[data-theme="dark"] .sidebar {
+    border-right: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .nav-item:hover {
+    background-color: #12333a;
+}
+
+/* ---------- 11. Smooth theme switching on everything ---------- */
+.task-item,
+.goal-item,
+.habit-item,
+.topic-item,
+.project-item,
+.note-item,
+.deadline-item,
+.search-result,
+.task-overview-card,
+.task-filter,
+input,
+textarea,
+select,
+.theme-toggle,
+.search-button {
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+/* ---------- 12. Mobile: keep date + select from overflowing ---------- */
+@media (max-width: 768px) {
+
+    .profile-card {
+    margin: 10px auto;
+    padding: 25px 20px;
+}
+
+.profile-large-avatar {
+    width: 65px;
+    height: 65px;
+    font-size: 26px;
+}
+
+.profile-edit-actions {
+    flex-direction: column;
+}
+
+    .logout-button {
+    height: 38px;
+    padding: 0 12px;
+    font-size: 13px;
+    }
+    .task-input input[type="date"],
+    .task-input select,
+    .project-info select {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .task-item,
+    .goal-item,
+    .habit-item,
+    .topic-item,
+    .project-item {
+        word-break: break-word;
+    }
+}
+
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: #baebf1;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 35px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.auth-card h1 {
+    margin-bottom: 10px;
+    color: #0c495f;
+}
+
+.auth-subtitle {
+    margin-bottom: 25px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.auth-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.auth-card label {
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.auth-card input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #d5d5d5;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+}
+
+.auth-card input:focus {
+    border-color: #0c495f;
+}
+
+.auth-card button {
+    margin-top: 15px;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    background: #0c495f;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.auth-error {
+    margin-top: 8px;
+    color: #c62828;
+    font-size: 14px;
+}
+
+.auth-switch {
+    margin-top: 20px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+}
+
+.auth-switch a {
+    color: #0c495f;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.logout-button {
+    height: 42px;
+    padding: 0 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 21px;
+    background-color: var(--card-color);
+    color: var(--danger-color);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.logout-button:hover {
+    background-color: var(--hover-color);
+}
+
+.profile-section {
+        text-decoration: none;
+        color: inherit;
+
+        position: fixed;
+        left: 15px;
+        bottom: 15px;
+
+        margin: 0;
+        padding: 8px 12px;
+        border: 1px solid #333;
+        border-radius: 12px;
+
+        background-color: #000;
+
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        z-index: 1000;
+    }
+
+    .profile-avatar {
+        width: 34px;
+        height: 34px;
+        flex-shrink: 0;
+    }
+
+    .profile-info strong {
+        font-size: 13px;
+    }
+
+    .profile-info span {
+        font-size: 10px;
+        max-width: 120px;
+    }
+
+    .profile-section:hover {
+    text-decoration: none;
+}
+
+/* =========================
+   Profile Page
+========================= */
+
+.profile-page {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.profile-card {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 35px;
+    background-color: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 6px 20px var(--shadow-color);
+}
+
+.profile-large-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    color: var(--accent-contrast);
+
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.profile-card h1 {
+    color: var(--text-color);
+    margin-bottom: 5px;
+}
+
+.profile-email {
+    color: var(--secondary-text);
+    margin-bottom: 30px;
+}
+
+.profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+    margin-bottom: 25px;
+}
+
+.profile-details div {
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+}
+
+.profile-details span {
+    display: block;
+    font-size: 12px;
+    color: var(--secondary-text);
+    margin-bottom: 5px;
+}
+
+.profile-details strong {
+    color: var(--text-color);
+}
+
+.profile-edit-btn,
+.profile-logout-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.profile-edit-btn {
+    border: none;
+    background-color: var(--accent-color);
+    color: var(--accent-contrast);
+}
+
+.profile-logout-btn {
+    margin-top: 10px;
+    border: 1px solid var(--border-color);
+    background-color: transparent;
+    color: var(--danger-color);
+}
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+}
+
+.profile-form label {
+    margin-top: 8px;
+    color: var(--text-color);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.profile-form input {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.profile-edit-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.profile-edit-actions button {
+    flex: 1;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--accent-color);
+    color: var(--accent-contrast);
+    cursor: pointer;
+}
+
+.profile-edit-actions .profile-cancel-btn {
+    background-color: var(--hover-color);
+    color: var(--text-color);
+}
+
+.profile-error {
+    margin-top: 8px;
+    color: var(--danger-color);
+    font-size: 14px;
+}
+
+.profile-success {
+    margin-bottom: 15px;
+    color: #2e7d32;
+    font-size: 14px;
+}
+
+/* =========================
+   Important Deadlines
+========================= */
+
+.deadlines-card {
+    width: 100%;
+    max-width: 1000px;
+
+    margin: 25px auto 0;
+    padding: 24px;
+
+    background-color: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+
+    box-sizing: border-box;
+}
+
+.deadlines-header h2 {
+    margin: 0;
+    color: var(--text-color);
+}
+
+.deadlines-header p {
+    margin-top: 6px;
+    color: var(--secondary-text);
+}
+
+.deadline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.deadline-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+
+    padding: 16px;
+
+    background-color: var(--input-color);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+
+    transition: background-color 0.2s ease,
+                border-color 0.2s ease,
+                transform 0.2s ease;
+}
+
+.deadline-item:hover {
+    transform: translateY(-2px);
+    background-color: var(--hover-color);
+}
+
+.deadline-info {
+    min-width: 0;
+}
+
+.deadline-info h3 {
+    margin: 4px 0;
+    color: var(--text-color);
+}
+
+.deadline-type {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-color);
+}
+
+.deadline-date {
+    font-size: 13px;
+    color: var(--secondary-text);
+}
+
+.deadline-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.deadline-overdue {
+    color: #c0392b;
+    font-weight: 600;
+}
+
+.deadline-today {
+    color: #d97706;
+    font-weight: 600;
+}
+
+.deadline-upcoming {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    .deadlines-card {
+        margin-top: 20px;
+        padding: 18px;
+    }
+
+    .deadline-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .deadline-right {
+        width: 100%;
+        justify-content: space-between;
+    }
 }
