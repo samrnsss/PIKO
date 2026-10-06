@@ -2,105 +2,122 @@ import { createContext, useState } from "react";
 
 const AuthContext = createContext();
 
+const API_URL = "http://localhost:5000/api/auth";
+
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(() => {
         const savedUser = localStorage.getItem("pikoUser");
         return savedUser ? JSON.parse(savedUser) : null;
     });
 
-    function signup(name, email, password) {
-        const users = JSON.parse(localStorage.getItem("pikoUsers")) || [];
+    // SIGNUP
+    async function signup(name, email, password) {
+        try {
+            const response = await fetch(`${API_URL}/signup`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    password
+                })
+            });
 
-        const existingUser = users.find(
-            (item) => item.email.toLowerCase() === email.toLowerCase()
-        );
+            const data = await response.json();
 
-        if (existingUser) {
+            if (!response.ok) {
+                return {
+                    success: false,
+                    message: data.message || "Signup failed."
+                };
+            }
+
+            localStorage.setItem(
+                "pikoUser",
+                JSON.stringify(data.user)
+            );
+
+            setUser(data.user);
+
+            return {
+                success: true
+            };
+        } catch (error) {
+            console.error("Signup error:", error);
+
             return {
                 success: false,
-                message: "An account with this email already exists."
+                message: "Unable to connect to the server."
             };
         }
-
-        const newUser = {
-            id: Date.now(),
-            name,
-            email,
-            password
-        };
-
-        users.push(newUser);
-
-        localStorage.setItem("pikoUsers", JSON.stringify(users));
-        localStorage.setItem("pikoUser", JSON.stringify(newUser));
-
-        setUser(newUser);
-
-        return {
-            success: true
-        };
     }
 
-    function login(email, password) {
-        const users = JSON.parse(localStorage.getItem("pikoUsers")) || [];
+    // LOGIN
+    async function login(email, password) {
+        try {
+            const response = await fetch(`${API_URL}/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email,
+                    password
+                })
+            });
 
-        const foundUser = users.find(
-            (item) =>
-                item.email.toLowerCase() === email.toLowerCase() &&
-                item.password === password
-        );
+            const data = await response.json();
 
-        if (!foundUser) {
+            if (!response.ok) {
+                return {
+                    success: false,
+                    message: data.message || "Login failed."
+                };
+            }
+
+            localStorage.setItem(
+                "pikoUser",
+                JSON.stringify(data.user)
+            );
+
+            setUser(data.user);
+
+            return {
+                success: true
+            };
+        } catch (error) {
+            console.error("Login error:", error);
+
             return {
                 success: false,
-                message: "Invalid email or password."
+                message: "Unable to connect to the server."
             };
         }
-
-        localStorage.setItem("pikoUser", JSON.stringify(foundUser));
-        setUser(foundUser);
-
-        return {
-            success: true
-        };
     }
 
+    // PROFILE
     function updateProfile(name, email) {
-    const users = JSON.parse(localStorage.getItem("pikoUsers")) || [];
+        const updatedUser = {
+            ...user,
+            name,
+            email
+        };
 
-    const emailExists = users.find(
-        (item) =>
-            item.email.toLowerCase() === email.toLowerCase() &&
-            item.id !== user.id
-    );
+        localStorage.setItem(
+            "pikoUser",
+            JSON.stringify(updatedUser)
+        );
 
-    if (emailExists) {
+        setUser(updatedUser);
+
         return {
-            success: false,
-            message: "Another account is already using this email."
+            success: true
         };
     }
 
-    const updatedUser = {
-        ...user,
-        name,
-        email
-    };
-
-    const updatedUsers = users.map((item) =>
-        item.id === user.id ? updatedUser : item
-    );
-
-    localStorage.setItem("pikoUsers", JSON.stringify(updatedUsers));
-    localStorage.setItem("pikoUser", JSON.stringify(updatedUser));
-
-    setUser(updatedUser);
-
-    return {
-        success: true
-    };
-}
-
+    // LOGOUT
     function logout() {
         localStorage.removeItem("pikoUser");
         setUser(null);

@@ -11,10 +11,10 @@ function Login() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
         e.preventDefault();
 
-        const result = login(email, password);
+        const result =await  login(email, password);
 
         if (!result.success) {
             setError(result.message);

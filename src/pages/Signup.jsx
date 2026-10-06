@@ -13,7 +13,7 @@ function Signup() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
 
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
         e.preventDefault();
 
         if (password !== confirmPassword) {
@@ -21,7 +21,7 @@ function Signup() {
             return;
         }
 
-        const result = signup(name, email, password);
+        const result = await signup(name, email, password);
 
         if (!result.success) {
             setError(result.message);
