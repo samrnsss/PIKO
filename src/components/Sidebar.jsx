@@ -1,5 +1,6 @@
 import { NavLink, Link } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { Mascot } from "page-mascot";
 
 function Sidebar({ setSearchOpen, setSearchTerm }) {
     const { user } = useAuth();
@@ -17,7 +18,18 @@ function Sidebar({ setSearchOpen, setSearchTerm }) {
     return (
         <aside className="sidebar">
 
-            <h2 className="logo">PIKO</h2>
+            <div className="logo-row">
+                <h2 className="logo">PIKO</h2>
+
+                <div className="sidebar-mascot">
+                    <Mascot
+                        directions="/mascots/koala-directions.webp"
+                        reactions="/mascots/koala-reactions.webp"
+                        size={50}
+                        label= "PIKO Mascot"
+                    />
+                </div>
+            </div>
 
             <nav>
                 {menuItems.map((item) => (

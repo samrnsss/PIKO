@@ -1,6 +1,8 @@
 import { createContext, useEffect, useState } from "react";
 import { useAuth } from "./useAuth";
 
+const API_URL = "http://localhost:5000/api";
+
 const DataContext = createContext();
 
 function getStorageKey(email) {
@@ -57,10 +59,15 @@ useEffect(() => {
 
     const key = getStorageKey(user.email);
 
-    localStorage.setItem(
-        key,
-        JSON.stringify(data)
-    );
+    const dataForLocalStorage = {
+    ...data,
+    tasks: []
+};
+
+localStorage.setItem(
+    key,
+    JSON.stringify(dataForLocalStorage)
+);
 }, [data, user?.email]);
 
     // =========================
@@ -85,59 +92,192 @@ useEffect(() => {
     // TASKS
     // =========================
 
-    function addTask(task) {
+    // =========================
+// TASKS
+// =========================
+
+// Load tasks from MongoDB
+useEffect(() => {
+    if (!user?.id) {
+        return;
+    }
+
+    async function loadTasks() {
+        try {
+            const response = await fetch(
+                `${API_URL}/tasks?userId=${user.id}`
+            );
+
+            const tasksFromDatabase = await response.json();
+
+            if (!response.ok) {
+                console.error("Failed to load tasks:", tasksFromDatabase);
+                return;
+            }
+
+            const formattedTasks = tasksFromDatabase.map((task) => ({
+                ...task,
+                id: task._id
+            }));
+
+            setData((prev) => ({
+                ...prev,
+                tasks: formattedTasks
+            }));
+        } catch (error) {
+            console.error("Load tasks error:", error);
+        }
+    }
+
+    loadTasks();
+}, [user?.id]);
+
+
+// CREATE TASK
+async function addTask(task) {
+    try {
+        const response = await fetch(`${API_URL}/tasks`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                text: task.text,
+                priority: task.priority,
+                dueDate: task.dueDate,
+                userId: user.id
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error("Create task failed:", data);
+            return;
+        }
+
         const newTask = {
-            id: Date.now(),
-            text: task.text,
-            priority: task.priority,
-            dueDate: task.dueDate,
-            completed: false
+            ...data.task,
+            id: data.task._id
         };
 
         setData((prev) => ({
             ...prev,
-            tasks: [...prev.tasks, newTask]
+            tasks: [newTask, ...prev.tasks]
         }));
+    } catch (error) {
+        console.error("Create task error:", error);
     }
+}
 
-    function updateTask(id, updatedTask) {
+
+// UPDATE TASK
+async function updateTask(id, updatedTask) {
+    try {
+        const response = await fetch(`${API_URL}/tasks/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                text: updatedTask.text,
+                priority: updatedTask.priority,
+                dueDate: updatedTask.dueDate,
+                userId: user.id
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error("Update task failed:", data);
+            return;
+        }
+
+        const updated = {
+            ...data.task,
+            id: data.task._id
+        };
+
         setData((prev) => ({
             ...prev,
             tasks: prev.tasks.map((task) =>
-                task.id === id
-                    ? {
-                        ...task,
-                        text: updatedTask.text,
-                        priority: updatedTask.priority,
-                        dueDate: updatedTask.dueDate
-                    }
-                    : task
+                task.id === id ? updated : task
             )
         }));
+    } catch (error) {
+        console.error("Update task error:", error);
     }
+}
 
-    function toggleTask(id) {
+
+// TOGGLE TASK
+async function toggleTask(id) {
+    try {
+        const response = await fetch(
+            `${API_URL}/tasks/${id}/toggle`,
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    userId: user.id
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error("Toggle task failed:", data);
+            return;
+        }
+
+        const updated = {
+            ...data.task,
+            id: data.task._id
+        };
+
         setData((prev) => ({
             ...prev,
             tasks: prev.tasks.map((task) =>
-                task.id === id
-                    ? {
-                        ...task,
-                        completed: !task.completed
-                    }
-                    : task
+                task.id === id ? updated : task
             )
         }));
+    } catch (error) {
+        console.error("Toggle task error:", error);
     }
+}
 
-    function deleteTask(id) {
+
+// DELETE TASK
+async function deleteTask(id) {
+    try {
+        const response = await fetch(
+            `${API_URL}/tasks/${id}?userId=${user.id}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error("Delete task failed:", data);
+            return;
+        }
+
         setData((prev) => ({
             ...prev,
             tasks: prev.tasks.filter(
                 (task) => task.id !== id
             )
         }));
+    } catch (error) {
+        console.error("Delete task error:", error);
     }
+}
 
     // =========================
     // GOALS

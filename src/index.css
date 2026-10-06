@@ -2195,3 +2195,27 @@ select,
         justify-content: space-between;
     }
 }
+.logo-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo-row .logo {
+    margin: 0;
+}
+
+.logo-row > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-mascot {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
