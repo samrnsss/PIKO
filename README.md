@@ -14,4 +14,4 @@ It helps manage **tasks, goals, habits, learning, projects, and notes** through 
 * 🚀 **Project Management** — Keep track of personal projects and their progress.
 * 📝 **Notes** — Store ideas, thoughts, and important information in one place.
 
-PIKO is currently being developed as a learning project while exploring
+PIKO is currently being developed as a learning project.
