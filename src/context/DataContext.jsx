@@ -61,7 +61,10 @@ useEffect(() => {
 
     const dataForLocalStorage = {
     ...data,
-    tasks: []
+    tasks: [],
+    goals: [],
+    habits: [],
+    topics: [],
 };
 
 localStorage.setItem(
@@ -87,14 +90,6 @@ localStorage.setItem(
             }
         }));
     }
-
-    // =========================
-    // TASKS
-    // =========================
-
-    // =========================
-// TASKS
-// =========================
 
 // Load tasks from MongoDB
 useEffect(() => {
@@ -283,164 +278,525 @@ async function deleteTask(id) {
     // GOALS
     // =========================
 
-    function addGoal(goal) {
-        const newGoal = {
-            id: Date.now(),
-            text: goal.text,
-            dueDate: goal.dueDate,
-            completed: false
-        };
+    //load goals from MongoDB
+    useEffect(() => {
+        if (!user?.id) {
+            return;
+        }
+        async function loadGoals() {
+            try {
+                const response = await fetch(
+                    `${API_URL}/goals?userId=${user.id}`
+                );
+                const goalsFromDatabase = await response.json();
 
-        setData((prev) => ({
-            ...prev,
-            goals: [...prev.goals, newGoal]
-        }));
+                if (!response.ok) {
+                    console.error("Failed to load goals:", goalsFromDatabase);
+                    return;
+                }
+                const formattedGoals = goalsFromDatabase.map((goal) => ({
+                    ...goal,
+                    id: goal._id
+                }));
+
+                setData((prev) => ({
+                    ...prev,
+                    goals: formattedGoals
+                }));
+            } catch (error) {
+                console.error("Load goals error:", error);
+            }
+        }
+
+        loadGoals();
+    }, [user?.id]);
+
+    // CREATE GOAL
+    async function addGoal(goal) {
+        try {
+            const response = await fetch(
+                `${API_URL}/goals`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        text: goal.text,
+                        dueDate: goal.dueDate,
+                        userId: user.id
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Add goal failed:", data);
+                return;
+            }
+
+            const newGoal = {
+                ...data.goal,
+                id: data.goal._id
+            };
+
+            setData((prev) => ({
+                ...prev,
+                goals: [newGoal, ...prev.goals]
+            }));
+        } catch (error) {
+            console.error("Add goal error:", error);
+        }
     }
 
-    function updateGoal(id, updatedGoal) {
-        setData((prev) => ({
-            ...prev,
-            goals: prev.goals.map((goal) =>
-                goal.id === id
-                    ? {
-                        ...goal,
+    // UPDATE GOAL
+    async function updateGoal(id, updatedGoal) {
+        try {
+            const response = await fetch(
+                `${API_URL}/goals/${id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
                         text: updatedGoal.text,
-                        dueDate: updatedGoal.dueDate
-                    }
-                    : goal
-            )
-        }));
+                        dueDate: updatedGoal.dueDate,
+                        userId: user.id
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Update goal failed:", data);
+                return;
+            }
+
+            const updated = {
+                ...data.goal,
+                id: data.goal._id
+            };
+
+            setData((prev) => ({
+                ...prev,
+                goals: prev.goals.map((goal) =>
+                    goal.id === id ? updated : goal
+                )
+            }));
+        } catch (error) {
+            console.error("Update goal error:", error);
+        }
     }
 
-    function toggleGoal(id) {
-        setData((prev) => ({
-            ...prev,
-            goals: prev.goals.map((goal) =>
-                goal.id === id
-                    ? {
-                        ...goal,
-                        completed: !goal.completed
-                    }
-                    : goal
-            )
-        }));
+    //toggle goal
+
+    async function toggleGoal(id) {
+        try {
+            const response = await fetch(
+                `${API_URL}/goals/${id}/toggle`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    userId: user.id
+                })
+            }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Toggle goal failed:", data);
+                return;
+            }
+
+            const updated = {
+                ...data.goal,
+                id: data.goal._id
+            };
+
+            setData((prev) => ({
+                ...prev,
+                goals: prev.goals.map((goal) =>
+                    goal.id === id ? updated : goal
+                )
+            }));
+        } catch (error) {
+            console.error("Toggle goal error:", error);
+        }
     }
 
-    function deleteGoal(id) {
-        setData((prev) => ({
-            ...prev,
-            goals: prev.goals.filter(
-                (goal) => goal.id !== id
-            )
-        }));
+    //delete goal
+    async function deleteGoal(id) {
+        try {
+            const response = await fetch(
+                `${API_URL}/goals/${id}?userId=${user.id}`,
+                {
+                    method: "DELETE"
+                }
+            );
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Delete goal failed:", data);
+                return;
+            }
+
+            setData((prev) => ({
+                ...prev,
+                goals: prev.goals.filter(
+                    (goal) => goal.id !== id
+                )
+            }));
+        } catch (error) {
+            console.error("Delete goal error:", error);
+        }
     }
 
-    // =========================
+    // /loads topics from mongoDB
+    useEffect(() => {
+        if (!user?.id)
+            return;
+        
+        async function loadTopics() {
+            try {
+                const response = await fetch(
+                    `${API_URL}/topics?userId=${user.id}`
+                );
+
+                const topicsFromDatabase = await response.json();
+
+                if (!response.ok) {
+                    console.error("Failed to load topics:", topicsFromDatabase);
+                    return;
+                }
+
+                const formattedTopics = topicsFromDatabase.map((topic) => ({
+                    ...topic,
+                    id: topic._id
+                }));
+
+                setData((prev) => ({
+                    ...prev,
+                    topics: formattedTopics
+                }));
+            } catch (error) {
+                console.error("Load topics error:", error);
+            }
+        }
+        loadTopics();
+    }, [user?.id]);
+
     // HABITS
-    // =========================
 
-    function addHabit(habit) {
-        const newHabit = {
-            id: Date.now(),
-            name: habit,
-            completed: false
-        };
+    //load habits from mongoDB
+    useEffect(() => {
+        if (!user?.id) {
+            return;
+        }
+        async function loadHabits() {
+            try {
+                const response = await fetch(
+                    `${API_URL}/habits?userId=${user.id}`
+                );
+                const habitsFromDatabase = await response.json();
 
-        setData((prev) => ({
-            ...prev,
-            habits: [...prev.habits, newHabit]
-        }));
+                if (!response.ok) {
+                    console.error("Failed to load habits:", habitsFromDatabase);
+                    return;
+                }
+                const formattedHabits = habitsFromDatabase.map((habit) => ({
+                    ...habit,
+                    id: habit._id
+                }));
+                setData((prev) => ({
+                    ...prev,
+                    habits: formattedHabits
+                }));
+            } catch (error) {
+                console.error("Load habits error:", error);
+            }
+        }
+        loadHabits();
+    }, [user?.id]);
+
+    //create habit
+
+    async function addHabit(habit) {
+        try {
+            const response = await fetch(`${API_URL}/habits`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: habit,
+                    userId: user.id
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Create a habit failed:", data);
+                return;
+            }
+
+            const newHabit = {
+                ...data.habit,
+                id: data.habit._id
+            };
+
+            setData((prev) => ({
+                ...prev,
+                habits: [...prev.habits, newHabit]
+            }));
+        } catch (error) {
+            console.error("Create a habit error:", error);
+        }
     }
 
-    function updateHabit(id, updatedHabit) {
-        setData((prev) => ({
-            ...prev,
-            habits: prev.habits.map((habit) =>
-                habit.id === id
-                    ? {
-                        ...habit,
-                        name: updatedHabit.name
-                    }
-                    : habit
-            )
-        }));
+    //update habit
+    async function updateHabit(id, updatedHabit) {
+        try {
+            const response = await fetch(`${API_URL}/habits/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: updatedHabit.name,
+                    userId: user.id
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Update habit failed:", data);
+                return;
+            }
+
+            const updated = {
+                ...data.habit,
+                id: data.habit._id
+            };
+
+            setData((prev) => ({
+                ...prev,
+                habits: prev.habits.map((habit) =>
+                    habit.id === id
+                        ? updated
+                        : habit
+                )
+            }));
+        } catch (error) {
+            console.error("Update habit error:", error);
+        }
     }
 
-    function toggleHabit(id) {
-        setData((prev) => ({
-            ...prev,
-            habits: prev.habits.map((habit) =>
-                habit.id === id
-                    ? {
-                        ...habit,
-                        completed: !habit.completed
-                    }
-                    : habit
-            )
-        }));
+
+    //toggle habit
+    async function toggleHabit(id) {
+        try {
+            const response = await fetch(`${API_URL}/habits/${id}/toggle`, 
+                {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    userId: user.id
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Toggle habit failed:", data);
+                return;
+            }
+
+            const updated = {
+                ...data.habit,
+                id: data.habit._id
+            };
+
+            setData((prev) => ({
+                ...prev,
+                habits: prev.habits.map((habit) =>
+                    habit.id === id? updated : habit 
+                )
+            }));
+        } catch (error) {
+            console.error("Toggle habit error:", error);
+        }
     }
 
-    function deleteHabit(id) {
-        setData((prev) => ({
-            ...prev,
-            habits: prev.habits.filter(
-                (habit) => habit.id !== id
-            )
-        }));
+    //delete habit
+    async function deleteHabit(id) {
+        try {
+            const response = await fetch(
+                `${API_URL}/habits/${id}?userId=${user.id}`, 
+                {
+                method: "DELETE"
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Delete habit failed:", data);
+                return;
+            }
+            setData((prev) => ({
+                ...prev,
+                habits: prev.habits.filter(
+                    (habit) => habit.id !== id
+                )
+            }));
+        } catch (error) {
+            console.error("Delete habit error:", error);
+        }
     }
 
     // =========================
     // LEARNING
     // =========================
 
-    function addTopic(topic) {
-        const newTopic = {
-            id: Date.now(),
-            name: topic,
-            completed: false
-        };
+    async function addTopic(topic) {
+        try {
+            const response = await fetch(`${API_URL}/topics`, {
+                method: "POST", 
+                headers: {"Content-type": "application/json"},
+                body: JSON.stringify({
+                    name: typeof topic === "string" ? topic : topic.name,
+                    userId: user.id
+                })
+            });
 
-        setData((prev) => ({
-            ...prev,
-            topics: [...prev.topics, newTopic]
-        }));
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Add topic failed:", data);
+                return;
+            }
+
+            const newTopic = {
+                ...data.topic,
+                id: data.topic._id
+            };
+
+            setData((prev) => ({
+                ...prev,
+                topics: [...prev.topics, newTopic]
+            }));
+        } catch (error) {
+            console.error("Add topic error:", error);
+        }
     }
 
-    function updateTopic(id, updatedTopic) {
-        setData((prev) => ({
-            ...prev,
-            topics: prev.topics.map((topic) =>
-                topic.id === id
-                    ? {
-                        ...topic,
-                        name: updatedTopic.name
-                    }
-                    : topic
-            )
-        }));
+    async function updateTopic(id, updatedTopic) {
+        try {
+            const response = await fetch(`${API_URL}/topics/${id}`, {
+                method: "PUT",
+                headers: {"Content-type": "application/json"},
+                body: JSON.stringify({
+                    name: updatedTopic.name,
+                    userId: user.id
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Update topic failed:", data);
+                return;
+            }
+
+            const updated = {
+                ...data.topic,
+                id: data.topic._id
+            };
+
+            setData((prev) => ({
+                ...prev,
+                topics: prev.topics.map((topic) =>
+                    topic.id === id
+                        ? updated
+                        : topic
+                )
+            }));
+        } catch (error) {
+            console.error("Update topic error:", error);
+        }
     }
 
-    function toggleTopic(id) {
-        setData((prev) => ({
-            ...prev,
-            topics: prev.topics.map((topic) =>
-                topic.id === id
-                    ? {
-                        ...topic,
-                        completed: !topic.completed
-                    }
-                    : topic
-            )
-        }));
+    async function toggleTopic(id) {
+        try {
+            const response = await fetch(`${API_URL}/topics/${id}/toggle`, {
+                method: "PATCH",
+                headers: {"Content-type": "application/json"},
+                body: JSON.stringify({
+                    userId: user.id
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Toggle topic failed:", data);
+                return;
+            }
+
+            const updated = {
+                ...data.topic,
+                id: data.topic._id
+            };
+
+            setData((prev) => ({
+                ...prev,
+                topics: prev.topics.map((topic) =>
+                    topic.id === id
+                        ? updated
+                        : topic
+                )
+            }));
+        } catch (error) {
+            console.error("Toggle topic error:", error);
+        }
     }
 
-    function deleteTopic(id) {
-        setData((prev) => ({
-            ...prev,
-            topics: prev.topics.filter(
-                (topic) => topic.id !== id
-            )
-        }));
+    async function deleteTopic(id) {
+        try {
+            const response = await fetch(
+                `${API_URL}/topics/${id}?userId=${user.id}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Delete topic failed:", data);
+                return;
+            }
+
+            setData((prev) => ({
+                ...prev,
+                topics: prev.topics.filter(
+                    (topic) => topic.id !== id
+                )
+            }));
+        } catch (error) {
+            console.error("Delete topic error:", error);
+        }
     }
 
     // =========================

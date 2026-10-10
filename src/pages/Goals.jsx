@@ -96,16 +96,21 @@ useEffect(() => {
             <div className="goal-input">
 
                 <input
-                    type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                />
-
-                <input
                     type="text"
                     value={goal}
                     placeholder="Add a new goal..."
                     onChange={(e) => setGoal(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            handleAddGoal();
+                        }
+                    }}
+                />
+
+                <input
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
                     onKeyDown={(e) => {
                         if (e.key === "Enter") {
                             handleAddGoal();

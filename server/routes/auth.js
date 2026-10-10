@@ -33,7 +33,7 @@ router.post("/signup", async (req, res) => {
         // Create user
         const user = new User({
             name,
-            email,
+            email: email.toLowerCase(),
             passwordHash
         });
 

@@ -147,6 +147,15 @@ function Tasks() {
                     onChange={(e) => setDueDate(e.target.value)}
                 />
 
+                <select
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value)}
+                >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+
                 {editingTaskId === null ?(
                 <button onClick={handleAddTask}>
                     Add Task
@@ -165,14 +174,6 @@ function Tasks() {
                     </button>
                 </>
                 )}
-                <select
-                    value={priority}
-                    onChange={(e) => setPriority(e.target.value)}
-                >
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                </select>
 
             </div>
 

@@ -173,9 +173,29 @@ Main Content
 }
 
 .task-input {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 160px auto 120px;
     gap: 10px;
     margin-bottom: 25px;
+    align-items: center;
+}
+
+.task-input input[type="text"] {
+    min-width: 0;
+}
+
+.task-input input[type="date"] {
+    width: 100%;
+    min-width: 0;
+}
+
+.task-input select {
+    width: 100%;
+    min-width: 0;
+}
+
+.task-input button {
+    white-space: nowrap;
 }
 
 .task-input input {
@@ -804,17 +824,14 @@ Main Content
     width: 100%;
 }
 
-.task-input input {
+.task-input input[type="text"] {
     grid-column: 1 / -1;
     width: 100%;
-    min-width: 0;
 }
 
+.task-input input[type="date"],
+.task-input select,
 .task-input button {
-    width: 100%;
-}
-
-.task-input select {
     width: 100%;
     min-width: 0;
 }
@@ -2218,4 +2235,9 @@ select,
     align-items: center;
     justify-content: center;
     overflow: hidden;
+}
+
+.completed {
+    text-decoration: line-through;
+    opacity: 0.6;
 }

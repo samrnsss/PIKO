@@ -41,7 +41,7 @@ function Projects() {
 
     const [project, setProject] = useState("");
     const [description, setDescription] = useState("");
-
+    const [dueDate, setDueDate] = useState("");
     function handleAddProject() {
 
         if (project.trim() === "") {
@@ -51,11 +51,13 @@ function Projects() {
         addProject({
             name: project,
             description: description,
+            dueDate: dueDate,
             status: "Not Started"
         });
 
         setProject("");
         setDescription("");
+        setDueDate("");
     }
 
     return (
@@ -82,6 +84,12 @@ function Projects() {
                     placeholder="What is this project about?"
                     onChange={(e) => setDescription(e.target.value)}
                 ></textarea>
+                
+                <input
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                />
 
                 <button onClick={handleAddProject}>
                     Add Project
@@ -154,6 +162,8 @@ function Projects() {
                             </div>
 
                         </div>
+
+                        
 
                         <button
                             className="delete-btn"
