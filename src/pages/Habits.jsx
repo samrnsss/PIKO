@@ -125,11 +125,12 @@ useEffect(() => {
                             <input
                                 type="checkbox"
                                 checked={habit.completed}
+                                disabled={habit.completed}
                                 onChange={() => {
+                                    if (habit.completed) return;
+
                                     toggleHabit(habit.id);
-                                    if (!habit.completed) {
-                                        recordActivity();
-                                    }
+                                    recordActivity();
                                 }}
                             />
                             <span
